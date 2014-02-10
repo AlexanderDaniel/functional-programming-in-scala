@@ -34,8 +34,26 @@ class Exercise1Spec extends Specification {
     }
   }
 
+  object UsingFoldLeft {
+    def fib(n: Int): Int = {
+      (0 until n).foldLeft((0, 1)) { (z, _) =>
+          (z._2, z._1 + z._2)
+      }._1
+    }
+  }
+
+  object UsingFoldWithSymbols {
+    def fib(n: Int): Int = {
+      ((0, 1) /: (0 until n)) { (z, _) =>
+        (z._2, z._1 + z._2)
+      }._1
+    }
+  }
+
   testFib("fib", fib)
   testFib("solution", Solution.fib)
+  testFib("using fold", UsingFoldLeft.fib)
+  testFib("using fold with symbols", UsingFoldWithSymbols.fib)
 
   def testFib(h: String, fib: Int => Int) {
     h should {
