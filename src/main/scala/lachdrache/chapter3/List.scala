@@ -27,5 +27,16 @@ object List {
     case _ => drop(tail(l), n-1)
   }
 
+  /**
+   * More elegant way: https://github.com/pchiusano/fpinscala/blob/master/answerkey/datastructures/5.answer.scala
+   */
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+    case Nil => Nil
+    case Cons(x, xs) =>
+      if (f(x)) dropWhile(xs, f)
+      else l
+  }
+
+
 
 }
