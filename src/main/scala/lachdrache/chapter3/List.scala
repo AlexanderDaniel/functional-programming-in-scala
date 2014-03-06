@@ -19,4 +19,7 @@ object List {
     case Cons(x, xs) => xs
   }
 
+  def setHead[A](l: List[A], e: A) =
+    Cons(e, tail(l))
+
 }
