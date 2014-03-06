@@ -13,4 +13,10 @@ object List {
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
+
+  def tail[A](l: List[A]): List[A] = l match {
+    case Nil => throw new NoSuchElementException
+    case Cons(x, xs) => xs
+  }
+
 }
