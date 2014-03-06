@@ -22,4 +22,10 @@ object List {
   def setHead[A](l: List[A], e: A) =
     Cons(e, tail(l))
 
+  def drop[A](l: List[A], n: Int): List[A] = n match {
+    case 0 => l
+    case _ => drop(tail(l), n-1)
+  }
+
+
 }
