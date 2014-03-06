@@ -37,6 +37,10 @@ object List {
       else l
   }
 
-
+  def init[A](l: List[A]): List[A] = l match {
+    case Cons(x, Nil) => Nil
+    case Cons(x, xs) => Cons(x, init(xs))
+    case _ => throw new UnsupportedOperationException
+  }
 
 }
