@@ -25,6 +25,15 @@ object List {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
 
+  def oneTo(n: Int): List[Int] = {
+    @annotation.tailrec
+    def go(n: Int, acc: List[Int]): List[Int] = n match {
+      case 0 => acc
+      case _ => go(n-1, Cons(n, acc))
+    }
+    go(n, Nil)
+  }
+
   def tail[A](l: List[A]): List[A] = l match {
     case Nil => throw new NoSuchElementException
     case Cons(x, xs) => xs
