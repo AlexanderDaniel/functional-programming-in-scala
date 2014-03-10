@@ -95,7 +95,6 @@ class Exercise13Spec extends Specification {
       // probably because of the huge function chain which is built
       // f(1, f(2, f(3, f(4, ....
       // and which has to be evaluated.
-      // But are function arguments evaluated on a own stack frame?
     }
   }
 
