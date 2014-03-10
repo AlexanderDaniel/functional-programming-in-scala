@@ -116,4 +116,10 @@ object List {
     foldRight(l, List[B]()) { (a,z) =>
       Cons(f(a), z)
     }
+
+  def filter[A](l: List[A])(f: A => Boolean) =
+    foldRight(l, List[A]()) { (a,z) =>
+      if (f(a)) Cons(a, z)
+      else z
+    }
 }
