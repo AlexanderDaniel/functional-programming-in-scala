@@ -106,4 +106,9 @@ object List {
     foldRight(ints, List[Int]()) { (a,z) =>
       Cons(a+1, z)
     }
+
+  def doubleToString(ds: List[Double]):List[String] =
+    foldRight(ds, List[String]()) { (a,z) =>
+      Cons(a.toString, z)
+    }
 }
