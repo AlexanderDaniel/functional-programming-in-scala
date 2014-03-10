@@ -88,4 +88,15 @@ object List {
 
   def reverse[A](l: List[A]): List[A] =
     foldLeft(l, Nil:List[A])((z, a) => Cons(a, z))
+
+  def appendPatternMatching[A](a1: List[A], a2: List[A]): List[A] = a1 match {
+    case Nil => a2
+    case Cons(a, as) => Cons(a, appendPatternMatching(as, a2))
+  }
+
+  def append[A](a1: List[A], a2: List[A]): List[A] =
+    foldRight(a1, a2){(a, z) =>
+      Cons(a, z)
+    }
+
 }
