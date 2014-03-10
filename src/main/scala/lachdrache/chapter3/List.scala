@@ -102,4 +102,8 @@ object List {
   def concat[A](listOfLists: List[List[A]]): List[A] =
     foldRight(listOfLists, List[A]())((l, z) => append(l,z))
 
+  def inc(ints: List[Int]): List[Int] =
+    foldRight(ints, List[Int]()) { (a,z) =>
+      Cons(a+1, z)
+    }
 }
