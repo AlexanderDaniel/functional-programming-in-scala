@@ -99,4 +99,7 @@ object List {
       Cons(a, z)
     }
 
+  def flatten[A](listOfLists: List[List[A]]): List[A] =
+    foldRight(listOfLists, List[A]())((l, z) => append(l,z))
+
 }
