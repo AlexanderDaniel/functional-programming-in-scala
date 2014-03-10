@@ -111,4 +111,9 @@ object List {
     foldRight(ds, List[String]()) { (a,z) =>
       Cons(a.toString, z)
     }
+
+  def map[A,B](l: List[A])(f: A => B): List[B] =
+    foldRight(l, List[B]()) { (a,z) =>
+      Cons(f(a), z)
+    }
 }
