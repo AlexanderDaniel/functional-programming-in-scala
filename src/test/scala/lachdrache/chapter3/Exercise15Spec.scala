@@ -7,15 +7,15 @@ class Exercise15Spec extends Specification {
 
   "flatten" should {
     {
-      flatten(List(Nil, Nil)) === Nil
+      concat(List(Nil, Nil)) === Nil
     }.eg
 
     {
-      flatten(List(List(1,2), List(3))) === List(1,2,3)
+      concat(List(List(1,2), List(3))) === List(1,2,3)
     }.eg
 
     {
-      flatten(List(List(1), List(2,3), List(4,5,6))) === List(1,2,3,4,5,6)
+      concat(List(List(1), List(2,3), List(4,5,6))) === List(1,2,3,4,5,6)
     }.eg
   }
 }
