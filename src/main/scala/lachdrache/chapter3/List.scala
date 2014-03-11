@@ -130,4 +130,10 @@ object List {
 
   def flatMapSimple[A,B](l: List[A])(f: A => List[B]): List[B] =
     concat(map(l)(f))
+
+  def zipWith[A,B](l1: List[A], l2: List[A])(f: (A,A) => B): List[B] = (l1,l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
+  }
 }
