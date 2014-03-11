@@ -122,4 +122,12 @@ object List {
       if (f(a)) Cons(a, z)
       else z
     }
+
+  def flatMap[A,B](l: List[A])(f: A => List[B]): List[B] =
+    foldRight(l, List[B]()) { (a,z) =>
+      append(f(a), z)
+    }
+
+  def flatMapSimple[A,B](l: List[A])(f: A => List[B]): List[B] =
+    concat(map(l)(f))
 }
