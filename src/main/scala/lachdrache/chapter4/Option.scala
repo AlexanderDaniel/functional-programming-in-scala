@@ -24,3 +24,14 @@ sealed trait Option[+A] {
 case class Some[+A](get: A) extends Option[A]
 
 case object None extends Option[Nothing]
+
+
+object Option {
+  def map2WithMatch[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a,b) match {
+    case (Some(va), Some(vb)) => Some(f(va, vb))
+    case _ => None
+  }
+
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a flatMap (va => b map (vb => f(va, vb)))
+}
