@@ -18,8 +18,9 @@ class Exercise4Spec extends Specification {
 
   assert("sequence with pattern matching", sequenceWithPatternMatching)
   assert("sequence using map2", sequence)
-  assert("sequence using recursion", sequenceWithShortCircuit)
+  assert("sequence using recursion", sequenceRecur)
   assert("sequence with tail recursion", sequenceTailrec)
+  assert("sequence via traverse", sequenceViaTraverse)
 
   def assert(name: String, sequence: List[Option[Int]] => Option[List[Int]]) {
 

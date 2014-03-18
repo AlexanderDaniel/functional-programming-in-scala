@@ -46,9 +46,9 @@ object Option {
       map2(a,z)(_ :: _)
     }
 
-  def sequenceWithShortCircuit[A](l: List[Option[A]]): Option[List[A]] = l match {
+  def sequenceRecur[A](l: List[Option[A]]): Option[List[A]] = l match {
     case Nil => Some(Nil)
-    case head :: tail => map2(head, sequenceWithShortCircuit(tail))(_ :: _)
+    case head :: tail => map2(head, sequenceRecur(tail))(_ :: _)
   }
 
   def sequenceTailrec[A](l: List[Option[A]]): Option[List[A]] = {
@@ -60,4 +60,13 @@ object Option {
     }
     go(l, Some(Nil)) map(_.reverse)
   }
+
+  def traverse[A,B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
+    case Nil => Some(Nil)
+    case h :: t => map2(f(h), traverse(t)(f))(_ :: _)
+  }
+
+  def sequenceViaTraverse[A](l: List[Option[A]]): Option[List[A]] =
+    traverse(l)(identity)
+
 }
