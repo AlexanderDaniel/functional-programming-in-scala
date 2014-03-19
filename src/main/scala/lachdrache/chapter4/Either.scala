@@ -39,7 +39,6 @@ object Either {
 
   def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] = es match {
     case Nil => Right(Nil)
-    case Left(l) :: _ => Left(l)
-    case Right(r) :: t => sequence(t) map { rv => r :: rv }
+    case h :: t => h.map2(sequence(t)) { (hr, tr) => hr :: tr }
   }
 }
