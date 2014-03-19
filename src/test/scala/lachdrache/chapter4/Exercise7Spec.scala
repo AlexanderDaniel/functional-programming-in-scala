@@ -3,6 +3,10 @@ package lachdrache.chapter4
 import org.specs2.mutable.Specification
 import lachdrache.chapter4.Either._
 
+/** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/errorhandling/7.hint.txt hint]]
+  * and
+  * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/errorhandling/7.answer.scala answer]]
+  */
 class Exercise7Spec extends Specification {
 
   assertSequence("sequence via recursion", sequence)
