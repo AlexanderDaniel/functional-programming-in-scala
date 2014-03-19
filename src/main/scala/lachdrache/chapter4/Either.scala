@@ -41,4 +41,9 @@ object Either {
     case Nil => Right(Nil)
     case h :: t => h.map2(sequence(t)) { (hr, tr) => hr :: tr }
   }
+
+  def traverse[E, A, B](as: List[A])(f: A => Either[E,B]): Either[E, List[B]] = as match {
+    case Nil => Right(Nil)
+    case h :: t => f(h).map2(traverse(t)(f)) { (hr, tr) => hr :: tr }
+  }
 }

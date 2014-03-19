@@ -34,4 +34,22 @@ class Exercise7Spec extends Specification {
       sequence(List(Right(1), Left("err1"), Right(2))) === Left("err1")
     }.eg
   }
+
+  "traverse" should {
+    {
+      traverse(Nil)(identity) === Right(Nil)
+    }.eg
+
+    {
+      traverse(List(1,2,3))(a => Right(a*10)) === Right(List(10,20,30))
+    }.eg
+
+    {
+      traverse(List(1,2,3))(a => Left("err" + a)) === Left("err1")
+    }.eg
+
+    {
+      traverse(List(1,2,3))(a => if (a%2==0) Left("odd"+a) else Right(a)) === Left("odd2")
+    }.eg
+  }
 }
