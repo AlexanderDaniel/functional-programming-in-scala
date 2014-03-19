@@ -35,3 +35,11 @@ case class Right[+A](value: A) extends Either[Nothing, A]{
     b map (bValue => f(value, bValue))
 }
 
+object Either {
+
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] = es match {
+    case Nil => Right(Nil)
+    case Left(l) :: _ => Left(l)
+    case Right(r) :: t => sequence(t) map { rv => r :: rv }
+  }
+}
