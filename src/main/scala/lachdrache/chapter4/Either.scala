@@ -46,4 +46,7 @@ object Either {
     case Nil => Right(Nil)
     case h :: t => f(h).map2(traverse(t)(f)) { (hr, tr) => hr :: tr }
   }
+
+  def sequenceViaTraverse[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
+    traverse(es)(identity)
 }
