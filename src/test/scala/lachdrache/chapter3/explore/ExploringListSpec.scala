@@ -2,7 +2,7 @@ package lachdrache.chapter3.explore
 
 import org.specs2.mutable.Specification
 
-/** Exploring the functions available in [[scala.collection.immutable.List]] and it's compansion object */
+/** Exploring the functions available in [[scala.collection.immutable.List]] and it's companion object */
 class ExploringListSpec extends Specification {
 
   "iterate" should {
@@ -50,4 +50,5 @@ class ExploringListSpec extends Specification {
       List.fill(2,3)('a) === List(List('a,'a,'a),List('a,'a,'a))
     }.eg
   }
+
 }
