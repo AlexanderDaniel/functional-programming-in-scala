@@ -5,6 +5,12 @@ sealed trait Either[+E,+A] {
   def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B]
   def orElse[EE >: E, B>:A](b: => Either[EE,B]): Either[EE, B]
   def map2[EE >: E, B, C](b: Either[EE, B])(f: (A,B) => C): Either[EE, C]
+  def map2Validate[EE >: E, B, C](b: Either[EE, B])(f: (A,B) => C): Either[List[EE], C] = (this, b) match {
+    case (Left(l1), Left(l2)) => Left(List(l1, l2))
+    case (Left(l1), Right(r2)) => Left(List(l1))
+    case (Right(r1), Left(l2)) => Left(List(l2))
+    case (Right(r1), Right(r2)) => Right(f(r1, r2))
+  }
 }
 
 case class Left[+E](value: E) extends Either[E, Nothing] {
