@@ -122,24 +122,34 @@ class StreamSuite extends Specification {
     }
 
     "stream of natural numbers" in {
-      def streamFrom(n :Int): Stream[Int] =
-        cons(n, streamFrom(n+1))
-      val naturalNumbers = streamFrom(1)
       naturalNumbers.exists(_==13) === true
     }
   }
 
   "fibonacci numbers" should {
     {
-      def fib(n0: Int, n1: Int):Stream[Int] = {
-        val n2 = n0+n1
-        cons(n2, fib(n1, n2))
-      }
-      val fibs = cons(1, cons(1, fib(1,1)))
       fibs.take(3).toList === List(1,1,2)
       fibs.take(7).toList === List(1,1,2,3,5,8,13)
     }.eg
   }
 
+  "foldRight" should {
+    {
+      Stream(1,2,3).foldRight(0)(_+_) === 6
+    }.eg
 
+    {
+      Stream(1,2,3).foldRight("0")((a, z) => s"f($a, $z)") === "f(1, f(2, f(3, 0)))"
+    }.eg
+  }
+
+  "exists via foldRight" should {
+    {
+      naturalNumbers.exists(_==42) === true
+    }.eg
+
+    {
+      naturalNumbers.exists(_==0) === true
+    }.eg
+  }
 }

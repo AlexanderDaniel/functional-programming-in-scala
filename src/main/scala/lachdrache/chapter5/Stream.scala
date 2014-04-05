@@ -53,10 +53,19 @@ sealed trait Stream[+A] {
       else Empty
   }
 
-  def exists(p: A => Boolean): Boolean = this match {
+  @annotation.tailrec
+  final def exists(p: A => Boolean): Boolean = this match {
     case Cons(h,t) => p(h()) || t().exists(p)
     case _ => false
   }
+
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Cons(h,t) => f(h(), t().foldRight(z)(f))
+    case _ => z
+  }
+
+  def existsViaFoldRight(p: A => Boolean): Boolean =
+    foldRight(false)((a, z) => p(a) || z)
 
 }
 case object Empty extends Stream[Nothing]
@@ -74,5 +83,19 @@ object Stream {
   def apply[A](as: A*): Stream[A] =
     if (as.isEmpty) empty
     else cons(as.head, apply(as.tail: _*))
+
+  val naturalNumbers = {
+    def naturalNumbersFrom(n :Int): Stream[Int] =
+      cons(n, naturalNumbersFrom(n+1))
+    naturalNumbersFrom(1)
+  }
+
+  val fibs = {
+    def fib(n0: Int, n1: Int):Stream[Int] = {
+      val n2 = n0+n1
+      cons(n2, fib(n1, n2))
+    }
+    cons(1, cons(1, fib(1,1)))
+  }
 
 }
