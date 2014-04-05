@@ -227,4 +227,17 @@ class StreamSuite extends Specification {
     }.eg
   }
 
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/6.answer.scala answer]]
+    * of exercise 6 applies to exercise 7
+    */
+  "exercise 7: flatMap" should {
+    {
+      Stream(2,3).flatMap(n => naturalNumbers.take(n)).toList === List(1,2,1,2,3)
+    }.eg
+
+    {
+      naturalNumbers.take(5).flatMap(n => Stream(n.toString)).toList === List("1", "2", "3", "4", "5")
+    }.eg
+  }
+
 }
