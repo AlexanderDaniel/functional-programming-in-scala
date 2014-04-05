@@ -207,4 +207,24 @@ class StreamSuite extends Specification {
     }.eg
   }
 
+  "exercise 7: filter" should {
+    {
+      Stream(1,2,3,4,5).filter(_%2==0).toList === List(2,4)
+    }.eg
+
+    {
+      fibs.filter(_<=13).take(7).toList === List(1,1,2,3,5,8,13)
+    }.eg
+  }
+
+  "exercise 7: append" should {
+    {
+      Stream(1,2).append(Stream(3,4)).toList === List(1,2,3,4)
+    }.eg
+
+    {
+      Stream(0).append(fibs).take(5).toList === List(0,1,1,2,3)
+    }.eg
+  }
+
 }
