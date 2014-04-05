@@ -191,7 +191,20 @@ class StreamSuite extends Specification {
     {
       cons(1, cons({sys.error(""); 2}, Empty)).headOption === Some(1)
     }.eg
+  }
 
+  "exercise 7: map" should {
+    {
+      Stream().map(identity) === Stream()
+    }.eg
+
+    {
+      Stream(0,1,2).map(_+1).toList === List(1,2,3)
+    }.eg
+
+    {
+      naturalNumbers.map(_-1).take(5).toList === List(0,1,2,3,4)
+    }.eg
   }
 
 }
