@@ -116,20 +116,30 @@ class StreamSuite extends Specification {
     (Stream(1,2,3).exists(n => n%2==0) === true).eg
     (Stream(1,2,3).exists(n => n>3) === false).eg
 
-    {
+    "infinite stream of ones" in {
       lazy val stream: Stream[Int] = cons(1, stream)
       stream.exists(n => n==1) === true
-    }.eg
+    }
 
-    {
+    "stream of natural numbers" in {
       def streamFrom(n :Int): Stream[Int] =
         cons(n, streamFrom(n+1))
       val naturalNumbers = streamFrom(1)
       naturalNumbers.exists(_==13) === true
-    }.eg
+    }
   }
 
-
+  "fibonacci numbers" should {
+    {
+      def fib(n0: Int, n1: Int):Stream[Int] = {
+        val n2 = n0+n1
+        cons(n2, fib(n1, n2))
+      }
+      val fibs = cons(1, cons(1, fib(1,1)))
+      fibs.take(3).toList === List(1,1,2)
+      fibs.take(7).toList === List(1,1,2,3,5,8,13)
+    }.eg
+  }
 
 
 }
