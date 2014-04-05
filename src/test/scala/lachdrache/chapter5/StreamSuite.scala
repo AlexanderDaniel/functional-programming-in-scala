@@ -179,4 +179,19 @@ class StreamSuite extends Specification {
     (Stream(1,2,3).takeWhileViaFoldRight(x => x<1).toList === List()).eg
   }
 
+  "exercise 6: headOption via foldRight" should {
+    {
+      Stream().headOption === None
+    }.eg
+
+    {
+      Stream(1).headOption === Some(1)
+    }.eg
+
+    {
+      cons(1, cons({sys.error(""); 2}, Empty)).headOption === Some(1)
+    }.eg
+
+  }
+
 }
