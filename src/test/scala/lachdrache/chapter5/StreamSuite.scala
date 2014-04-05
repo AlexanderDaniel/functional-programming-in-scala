@@ -86,5 +86,31 @@ class StreamSuite extends Specification {
     (Stream(1,2,3).toListWithBuffer === List(1,2,3)).eg
   }
 
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/2.hint.txt hint]]
+    * and
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/2.answer.scala answer]]
+    */
+  "exercise 2: take(n)" should {
+    (Stream.empty.take(0).toList === List()).eg
+    (Stream.empty.take(1) should throwA[NoSuchElementException]).eg
+    (Stream(1,2,3).take(1).toList === List(1)).eg
+    (Stream(1,2,3).take(2).toList === List(1,2)).eg
+    (Stream(1,2,3).take(3).toList === List(1,2,3)).eg
+  }
+  "exercise 2: drop(n)" should {
+    (Stream.empty.drop(0).toList === List()).eg
+    (Stream.empty.drop(1) should throwA[NoSuchElementException]).eg
+    (Stream(1,2,3).drop(1).toList === List(2,3)).eg
+    (Stream(1,2,3).drop(2).toList === List(3)).eg
+  }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/3.answer.scala answer]] */
+  "exercise 3: takeWhile" should {
+    (Stream(1,2,3).takeWhile(_ => true).toList === List(1,2,3)).eg
+    (Stream(1,2,3).takeWhile(x => x<3).toList === List(1,2)).eg
+    (Stream(1,2,3).takeWhile(x => x<2).toList === List(1)).eg
+    (Stream(1,2,3).takeWhile(x => x<1).toList === List()).eg
+  }
+
 
 }
