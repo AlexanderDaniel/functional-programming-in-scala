@@ -1,6 +1,7 @@
 package lachdrache.chapter5
 
 import org.specs2.mutable.Specification
+import Stream._
 
 class StreamSuite extends Specification {
 
@@ -41,4 +42,49 @@ class StreamSuite extends Specification {
     // Probably this is related to the trade-off of Java and Scala to not
     // include the type information of generics for the runtime.
   }
+
+  "cons" should {
+    {
+      var cnt=0
+      cons({cnt+=1; 1}, Empty)
+      cnt === 0
+    }.eg
+  }
+
+  "apply" should {
+    {
+      Stream() === Empty
+    }.eg
+
+    /**
+     * I tried to define `def nonStrict[A](as: (=>A)*): Stream[A]`
+     * but the compiler says that `no by=name parameter type allowed here`
+     */
+    "uses by-value parameters (strict)" in {
+      var cnt=0
+      Stream({cnt+=1; 1})
+      cnt === 1
+    }
+  }
+
+  "exercise 1" should {
+    (Stream.empty.toList === List()).eg
+    (Stream(1).toList === List(1)).eg
+    (Stream(1,2,3).toList === List(1,2,3)).eg
+  }
+
+  "exercise 1 tailrec" should {
+    (Stream.empty.toListTailrec === List()).eg
+    (Stream(1).toListTailrec === List(1)).eg
+    (Stream(1,2,3).toListTailrec === List(1,2,3)).eg
+  }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/1.answer.scala answer]] */
+  "exercise 1 ListBuffer" should {
+    (Stream.empty.toListWithBuffer === List()).eg
+    (Stream(1).toListWithBuffer === List(1)).eg
+    (Stream(1,2,3).toListWithBuffer === List(1,2,3)).eg
+  }
+
+
 }
