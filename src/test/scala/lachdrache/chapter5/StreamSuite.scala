@@ -112,5 +112,24 @@ class StreamSuite extends Specification {
     (Stream(1,2,3).takeWhile(x => x<1).toList === List()).eg
   }
 
+  "exists" should {
+    (Stream(1,2,3).exists(n => n%2==0) === true).eg
+    (Stream(1,2,3).exists(n => n>3) === false).eg
+
+    {
+      lazy val stream: Stream[Int] = cons(1, stream)
+      stream.exists(n => n==1) === true
+    }.eg
+
+    {
+      def streamFrom(n :Int): Stream[Int] =
+        cons(n, streamFrom(n+1))
+      val naturalNumbers = streamFrom(1)
+      naturalNumbers.exists(_==13) === true
+    }.eg
+  }
+
+
+
 
 }
