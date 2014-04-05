@@ -170,4 +170,13 @@ class StreamSuite extends Specification {
       naturalNumbers.take(10).forall(_<10) === false
     }.eg
   }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/5.answer.scala answer]] */
+  "exercise 5: takeWhile via foldRight" should {
+    (Stream(1,2,3).takeWhileViaFoldRight(_ => true).toList === List(1,2,3)).eg
+    (Stream(1,2,3).takeWhileViaFoldRight(x => x<3).toList === List(1,2)).eg
+    (Stream(1,2,3).takeWhileViaFoldRight(x => x<2).toList === List(1)).eg
+    (Stream(1,2,3).takeWhileViaFoldRight(x => x<1).toList === List()).eg
+  }
+
 }
