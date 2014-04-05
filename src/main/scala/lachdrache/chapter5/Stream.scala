@@ -88,6 +88,9 @@ sealed trait Stream[+A] {
     foldRight(empty[B]) { (a,z) =>
       f(a) append z
     }
+
+  def find(p: A=>Boolean): Option[A] =
+    filter(p).headOption
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]

@@ -240,4 +240,14 @@ class StreamSuite extends Specification {
     }.eg
   }
 
+  "find" should {
+    {
+      naturalNumbers.find(_ == 13) === Some(13)
+    }.eg
+
+    {
+      naturalNumbers.take(12).find(_==13) === None
+    }.eg
+  }
+
 }
