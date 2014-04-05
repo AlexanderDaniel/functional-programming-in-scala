@@ -148,4 +148,26 @@ class StreamSuite extends Specification {
       naturalNumbers.exists(_==42) === true
     }.eg
   }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/4.hint.txt hint]]
+    * and
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/4.answer.scala answer]]
+    */
+  "exercise 4: forall" should {
+    {
+      Stream().forall(_ => false) === true
+    }.eg
+
+    {
+      naturalNumbers.forall(_ => false) === false
+    }.eg
+
+    {
+      naturalNumbers.take(9).forall(_<10) === true
+    }.eg
+
+    {
+      naturalNumbers.take(10).forall(_<10) === false
+    }.eg
+  }
 }
