@@ -139,17 +139,13 @@ class StreamSuite extends Specification {
     }.eg
 
     {
-      Stream(1,2,3).foldRight("0")((a, z) => s"f($a, $z)") === "f(1, f(2, f(3, 0)))"
+      Stream(1,2,3).foldRight("0")((a, z) => s"f($a, => $z)") === "f(1, => f(2, => f(3, => 0)))"
     }.eg
   }
 
   "exists via foldRight" should {
     {
       naturalNumbers.exists(_==42) === true
-    }.eg
-
-    {
-      naturalNumbers.exists(_==0) === true
     }.eg
   }
 }
