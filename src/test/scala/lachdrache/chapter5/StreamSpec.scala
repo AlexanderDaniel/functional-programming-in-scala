@@ -308,4 +308,20 @@ class StreamSpec extends Specification {
       fiveToZero.toList === List(5,4,3,2,1)
     }
   }
+
+  "exercise 13: map via unfold" should {
+    {
+      Stream().mapViaUnfold(identity) === Stream()
+    }.eg
+
+    {
+      Stream(0,1,2).mapViaUnfold(_+1).toList === List(1,2,3)
+    }.eg
+
+    {
+      naturalNumbers.mapViaUnfold(_-1).take(5).toList === List(0,1,2,3,4)
+    }.eg
+  }
+  
+  // TODO take, takeWhile, zipWith and zipAll via unfold
 }

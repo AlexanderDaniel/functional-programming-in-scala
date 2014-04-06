@@ -78,6 +78,11 @@ sealed trait Stream[+A] {
   def map[B](f: A => B): Stream[B] =
     foldRight(empty[B])((a,b) => cons(f(a), b))
 
+  def mapViaUnfold[B](f: A => B): Stream[B] = unfold(this) {
+    case Empty => None
+    case Cons(h, t) => Some((f(h()), t()))
+  }
+
   def filter(p: A => Boolean): Stream[A] =
     foldRight(empty[A])((a,b) => if (p(a)) cons(a, b) else b)
 
@@ -91,6 +96,8 @@ sealed trait Stream[+A] {
 
   def find(p: A=>Boolean): Option[A] =
     filter(p).headOption
+
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -127,12 +134,9 @@ object Stream {
     stream
   }
 
-  def unfold[A,S](z: S)(f: S => Option[(A,S)]): Stream[A] = {
-    f(z) match {
-      case None => empty
-      case Some((a,s)) => cons(a, unfold(s)(f))
-    }
-
+  def unfold[A,S](z: S)(f: S => Option[(A,S)]): Stream[A] = f(z) match {
+    case None => empty
+    case Some((a,s)) => cons(a, unfold(s)(f))
   }
 
 }
