@@ -335,6 +335,13 @@ class StreamSpec extends Specification {
     (Stream(1, 2, 3).takeViaUnfold(2).toList === List(1, 2)).eg
     (Stream(1, 2, 3).takeViaUnfold(3).toList === List(1, 2, 3)).eg
   }
+  
+  "exercise 13: takeWhile via unfold" should {
+    (Stream(1, 2, 3).takeWhileViaUnfold(_ => true).toList === List(1, 2, 3)).eg
+    (Stream(1, 2, 3).takeWhileViaUnfold(x => x < 3).toList === List(1, 2)).eg
+    (Stream(1, 2, 3).takeWhileViaUnfold(x => x < 2).toList === List(1)).eg
+    (Stream(1, 2, 3).takeWhileViaUnfold(x => x < 1).toList === List()).eg
+  }
 
   // TODO takeWhile, zipWith and zipAll via unfold
 }

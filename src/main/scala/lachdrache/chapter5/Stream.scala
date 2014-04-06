@@ -60,6 +60,12 @@ sealed trait Stream[+A] {
       else Empty
   }
 
+  def takeWhileViaUnfold(p: A => Boolean): Stream[A] =
+    unfold(this) {
+      case Cons(h, t) if p(h()) => Some((h(), t()))
+      case _ => None
+    }
+
   @annotation.tailrec
   final def exists(p: A => Boolean): Boolean = this match {
     case Cons(h,t) => p(h()) || t().exists(p)
