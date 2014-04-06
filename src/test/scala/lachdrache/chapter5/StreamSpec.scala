@@ -270,8 +270,10 @@ class StreamSpec extends Specification {
 
   // Same for exercise 10. Can be found above
 
-  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/10.answer.scala answer]] */
-  "exercise 11: unfold" should {
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/10.answer.scala answer exercise 11]]
+    * and
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/11.answer.scala answer exercise 12]]*/
+  "exercise 11 & 12: unfold" should {
 
     "create a stream of 1s" in {
       val streamOfOnes: Stream[Int] = unfold(1)(s => Some((s,s)))
