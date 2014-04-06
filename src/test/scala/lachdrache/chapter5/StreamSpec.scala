@@ -355,5 +355,14 @@ class StreamSpec extends Specification {
     }
   }
 
+  "exercise 13: zip" should {
+    "zip the elements of two streams" in {
+      val s1 = Stream("a", "b", "c")
+      val s2 = naturalNumbers
+      s1.zip(s2).toList === List(("a", 1), ("b", 2), ("c", 3))
+
+    }
+  }
+
   // TODO zipAll via unfold
 }
