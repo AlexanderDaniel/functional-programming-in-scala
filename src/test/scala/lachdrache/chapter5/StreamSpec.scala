@@ -3,7 +3,7 @@ package lachdrache.chapter5
 import org.specs2.mutable.Specification
 import Stream._
 
-class StreamSuite extends Specification {
+class StreamSpec extends Specification {
 
   "stream" should {
     {
@@ -253,6 +253,13 @@ class StreamSuite extends Specification {
   "ones" should {
     {
       ones.take(3).toList === List(1,1,1)
+    }.eg
+  }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/7.answer.scala answer]] */
+  "exercise 8: constant" should {
+    {
+      constant("z").take(5).toList === List("z","z","z","z","z")
     }.eg
   }
 

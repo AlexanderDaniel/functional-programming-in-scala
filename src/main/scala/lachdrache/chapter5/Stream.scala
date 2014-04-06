@@ -124,4 +124,10 @@ object Stream {
 
   val ones: Stream[Int] = cons(1, ones)
 
+  def constant[A](a: A): Stream[A] = {
+    lazy val stream: Stream[A] = cons(a, stream)
+    stream
+  }
+
+
 }
