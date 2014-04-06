@@ -250,4 +250,10 @@ class StreamSuite extends Specification {
     }.eg
   }
 
+  "ones" should {
+    {
+      ones.take(3).toList === List(1,1,1)
+    }.eg
+  }
+
 }

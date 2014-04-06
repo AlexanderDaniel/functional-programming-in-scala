@@ -122,4 +122,6 @@ object Stream {
     cons(1, cons(1, fib(1,1)))
   }
 
+  val ones: Stream[Int] = cons(1, ones)
+
 }
