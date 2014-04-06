@@ -45,8 +45,10 @@ class StreamSpec extends Specification {
 
   "cons" should {
     {
-      var cnt=0
-      cons({cnt+=1; 1}, Empty)
+      var cnt = 0
+      cons({
+        cnt += 1; 1
+      }, Empty)
       cnt === 0
     }.eg
   }
@@ -61,8 +63,10 @@ class StreamSpec extends Specification {
      * but the compiler says that `no by=name parameter type allowed here`
      */
     "uses by-value parameters (strict)" in {
-      var cnt=0
-      Stream({cnt+=1; 1})
+      var cnt = 0
+      Stream({
+        cnt += 1; 1
+      })
       cnt === 1
     }
   }
@@ -70,20 +74,20 @@ class StreamSpec extends Specification {
   "exercise 1" should {
     (Stream.empty.toList === List()).eg
     (Stream(1).toList === List(1)).eg
-    (Stream(1,2,3).toList === List(1,2,3)).eg
+    (Stream(1, 2, 3).toList === List(1, 2, 3)).eg
   }
 
   "exercise 1 tailrec" should {
     (Stream.empty.toListTailrec === List()).eg
     (Stream(1).toListTailrec === List(1)).eg
-    (Stream(1,2,3).toListTailrec === List(1,2,3)).eg
+    (Stream(1, 2, 3).toListTailrec === List(1, 2, 3)).eg
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/1.answer.scala answer]] */
   "exercise 1 ListBuffer" should {
     (Stream.empty.toListWithBuffer === List()).eg
     (Stream(1).toListWithBuffer === List(1)).eg
-    (Stream(1,2,3).toListWithBuffer === List(1,2,3)).eg
+    (Stream(1, 2, 3).toListWithBuffer === List(1, 2, 3)).eg
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/2.hint.txt hint]]
@@ -93,60 +97,60 @@ class StreamSpec extends Specification {
   "exercise 2: take(n)" should {
     (Stream.empty.take(0).toList === List()).eg
     (Stream.empty.take(1) should throwA[NoSuchElementException]).eg
-    (Stream(1,2,3).take(1).toList === List(1)).eg
-    (Stream(1,2,3).take(2).toList === List(1,2)).eg
-    (Stream(1,2,3).take(3).toList === List(1,2,3)).eg
+    (Stream(1, 2, 3).take(1).toList === List(1)).eg
+    (Stream(1, 2, 3).take(2).toList === List(1, 2)).eg
+    (Stream(1, 2, 3).take(3).toList === List(1, 2, 3)).eg
   }
   "exercise 2: drop(n)" should {
     (Stream.empty.drop(0).toList === List()).eg
     (Stream.empty.drop(1) should throwA[NoSuchElementException]).eg
-    (Stream(1,2,3).drop(1).toList === List(2,3)).eg
-    (Stream(1,2,3).drop(2).toList === List(3)).eg
+    (Stream(1, 2, 3).drop(1).toList === List(2, 3)).eg
+    (Stream(1, 2, 3).drop(2).toList === List(3)).eg
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/3.answer.scala answer]] */
   "exercise 3: takeWhile" should {
-    (Stream(1,2,3).takeWhile(_ => true).toList === List(1,2,3)).eg
-    (Stream(1,2,3).takeWhile(x => x<3).toList === List(1,2)).eg
-    (Stream(1,2,3).takeWhile(x => x<2).toList === List(1)).eg
-    (Stream(1,2,3).takeWhile(x => x<1).toList === List()).eg
+    (Stream(1, 2, 3).takeWhile(_ => true).toList === List(1, 2, 3)).eg
+    (Stream(1, 2, 3).takeWhile(x => x < 3).toList === List(1, 2)).eg
+    (Stream(1, 2, 3).takeWhile(x => x < 2).toList === List(1)).eg
+    (Stream(1, 2, 3).takeWhile(x => x < 1).toList === List()).eg
   }
 
   "exists" should {
-    (Stream(1,2,3).exists(n => n%2==0) === true).eg
-    (Stream(1,2,3).exists(n => n>3) === false).eg
+    (Stream(1, 2, 3).exists(n => n % 2 == 0) === true).eg
+    (Stream(1, 2, 3).exists(n => n > 3) === false).eg
 
     "infinite stream of ones" in {
       lazy val stream: Stream[Int] = cons(1, stream)
-      stream.exists(n => n==1) === true
+      stream.exists(n => n == 1) === true
     }
 
     "stream of natural numbers" in {
-      naturalNumbers.exists(_==13) === true
+      naturalNumbers.exists(_ == 13) === true
     }
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/9.answer.scala answer]] */
   "exercise 10: fibonacci numbers" should {
     {
-      fibs.take(3).toList === List(1,1,2)
-      fibs.take(7).toList === List(1,1,2,3,5,8,13)
+      fibs.take(3).toList === List(1, 1, 2)
+      fibs.take(7).toList === List(1, 1, 2, 3, 5, 8, 13)
     }.eg
   }
 
   "foldRight" should {
     {
-      Stream(1,2,3).foldRight(0)(_+_) === 6
+      Stream(1, 2, 3).foldRight(0)(_ + _) === 6
     }.eg
 
     {
-      Stream(1,2,3).foldRight("0")((a, z) => s"f($a, => $z)") === "f(1, => f(2, => f(3, => 0)))"
+      Stream(1, 2, 3).foldRight("0")((a, z) => s"f($a, => $z)") === "f(1, => f(2, => f(3, => 0)))"
     }.eg
   }
 
   "exists via foldRight" should {
     {
-      naturalNumbers.exists(_==42) === true
+      naturalNumbers.exists(_ == 42) === true
     }.eg
   }
 
@@ -164,20 +168,20 @@ class StreamSpec extends Specification {
     }.eg
 
     {
-      naturalNumbers.take(9).forall(_<10) === true
+      naturalNumbers.take(9).forall(_ < 10) === true
     }.eg
 
     {
-      naturalNumbers.take(10).forall(_<10) === false
+      naturalNumbers.take(10).forall(_ < 10) === false
     }.eg
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/5.answer.scala answer]] */
   "exercise 5: takeWhile via foldRight" should {
-    (Stream(1,2,3).takeWhileViaFoldRight(_ => true).toList === List(1,2,3)).eg
-    (Stream(1,2,3).takeWhileViaFoldRight(x => x<3).toList === List(1,2)).eg
-    (Stream(1,2,3).takeWhileViaFoldRight(x => x<2).toList === List(1)).eg
-    (Stream(1,2,3).takeWhileViaFoldRight(x => x<1).toList === List()).eg
+    (Stream(1, 2, 3).takeWhileViaFoldRight(_ => true).toList === List(1, 2, 3)).eg
+    (Stream(1, 2, 3).takeWhileViaFoldRight(x => x < 3).toList === List(1, 2)).eg
+    (Stream(1, 2, 3).takeWhileViaFoldRight(x => x < 2).toList === List(1)).eg
+    (Stream(1, 2, 3).takeWhileViaFoldRight(x => x < 1).toList === List()).eg
   }
 
   "exercise 6: headOption via foldRight" should {
@@ -190,7 +194,9 @@ class StreamSpec extends Specification {
     }.eg
 
     {
-      cons(1, cons({sys.error(""); 2}, Empty)).headOption === Some(1)
+      cons(1, cons({
+        sys.error(""); 2
+      }, Empty)).headOption === Some(1)
     }.eg
   }
 
@@ -200,31 +206,31 @@ class StreamSpec extends Specification {
     }.eg
 
     {
-      Stream(0,1,2).map(_+1).toList === List(1,2,3)
+      Stream(0, 1, 2).map(_ + 1).toList === List(1, 2, 3)
     }.eg
 
     {
-      naturalNumbers.map(_-1).take(5).toList === List(0,1,2,3,4)
+      naturalNumbers.map(_ - 1).take(5).toList === List(0, 1, 2, 3, 4)
     }.eg
   }
 
   "exercise 7: filter" should {
     {
-      Stream(1,2,3,4,5).filter(_%2==0).toList === List(2,4)
+      Stream(1, 2, 3, 4, 5).filter(_ % 2 == 0).toList === List(2, 4)
     }.eg
 
     {
-      fibs.filter(_<=13).take(7).toList === List(1,1,2,3,5,8,13)
+      fibs.filter(_ <= 13).take(7).toList === List(1, 1, 2, 3, 5, 8, 13)
     }.eg
   }
 
   "exercise 7: append" should {
     {
-      Stream(1,2).append(Stream(3,4)).toList === List(1,2,3,4)
+      Stream(1, 2).append(Stream(3, 4)).toList === List(1, 2, 3, 4)
     }.eg
 
     {
-      Stream(0).append(fibs).take(5).toList === List(0,1,1,2,3)
+      Stream(0).append(fibs).take(5).toList === List(0, 1, 1, 2, 3)
     }.eg
   }
 
@@ -233,7 +239,7 @@ class StreamSpec extends Specification {
     */
   "exercise 7: flatMap" should {
     {
-      Stream(2,3).flatMap(n => naturalNumbers.take(n)).toList === List(1,2,1,2,3)
+      Stream(2, 3).flatMap(n => naturalNumbers.take(n)).toList === List(1, 2, 1, 2, 3)
     }.eg
 
     {
@@ -247,20 +253,20 @@ class StreamSpec extends Specification {
     }.eg
 
     {
-      naturalNumbers.take(12).find(_==13) === None
+      naturalNumbers.take(12).find(_ == 13) === None
     }.eg
   }
 
   "ones" should {
     {
-      ones.take(3).toList === List(1,1,1)
+      ones.take(3).toList === List(1, 1, 1)
     }.eg
   }
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/7.answer.scala answer]] */
   "exercise 8: constant" should {
     {
-      constant("z").take(5).toList === List("z","z","z","z","z")
+      constant("z").take(5).toList === List("z", "z", "z", "z", "z")
     }.eg
   }
 
@@ -272,32 +278,32 @@ class StreamSpec extends Specification {
 
   /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/10.answer.scala answer exercise 11]]
     * and
-    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/11.answer.scala answer exercise 12]]*/
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/11.answer.scala answer exercise 12]] */
   "exercise 11 & 12: unfold" should {
 
     "create a stream of 1s" in {
-      val streamOfOnes: Stream[Int] = unfold(1)(s => Some((s,s)))
-      streamOfOnes.take(5).toList === List(1,1,1,1,1)
+      val streamOfOnes: Stream[Int] = unfold(1)(s => Some((s, s)))
+      streamOfOnes.take(5).toList === List(1, 1, 1, 1, 1)
     }
 
     "create the natural numbers" in {
-      val natural = unfold(1)(s => Some((s, s+1)))
-      natural.take(5).toList === List(1,2,3,4,5)
+      val natural = unfold(1)(s => Some((s, s + 1)))
+      natural.take(5).toList === List(1, 2, 3, 4, 5)
     }
 
     "fibonacci numbers" in {
-      val fib = unfold((0,1))(s => Some((s._1, (s._2, s._1+s._2))))
-      fib.take(8).toList === List(0,1,1,2,3,5,8,13)
+      val fib = unfold((0, 1))(s => Some((s._1, (s._2, s._1 + s._2))))
+      fib.take(8).toList === List(0, 1, 1, 2, 3, 5, 8, 13)
     }
 
     "even numbers" in {
-      val even = unfold(0)(s => Some((s, s+2)))
-      even.take(4).toList === List(0,2,4,6)
+      val even = unfold(0)(s => Some((s, s + 2)))
+      even.take(4).toList === List(0, 2, 4, 6)
     }
 
     "square of natural numbers" in {
-      val square = unfold(1)(s => Some((s*s, s+1)))
-      square.take(5).toList === List(1,4,9,16,25)
+      val square = unfold(1)(s => Some((s * s, s + 1)))
+      square.take(5).toList === List(1, 4, 9, 16, 25)
     }
 
     "stream from 5 to 1" in {
@@ -305,7 +311,7 @@ class StreamSpec extends Specification {
         case 0 => None
         case s => Some((s, s - 1))
       }
-      fiveToZero.toList === List(5,4,3,2,1)
+      fiveToZero.toList === List(5, 4, 3, 2, 1)
     }
   }
 
@@ -315,13 +321,20 @@ class StreamSpec extends Specification {
     }.eg
 
     {
-      Stream(0,1,2).mapViaUnfold(_+1).toList === List(1,2,3)
+      Stream(0, 1, 2).mapViaUnfold(_ + 1).toList === List(1, 2, 3)
     }.eg
 
     {
-      naturalNumbers.mapViaUnfold(_-1).take(5).toList === List(0,1,2,3,4)
+      naturalNumbers.mapViaUnfold(_ - 1).take(5).toList === List(0, 1, 2, 3, 4)
     }.eg
   }
-  
-  // TODO take, takeWhile, zipWith and zipAll via unfold
+
+  "exercise 13: take via unfold" should {
+    (Stream.empty.takeViaUnfold(0).toList === List()).eg
+    (Stream(1, 2, 3).takeViaUnfold(1).toList === List(1)).eg
+    (Stream(1, 2, 3).takeViaUnfold(2).toList === List(1, 2)).eg
+    (Stream(1, 2, 3).takeViaUnfold(3).toList === List(1, 2, 3)).eg
+  }
+
+  // TODO takeWhile, zipWith and zipAll via unfold
 }

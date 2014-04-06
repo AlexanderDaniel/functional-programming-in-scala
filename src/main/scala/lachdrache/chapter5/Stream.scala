@@ -37,6 +37,13 @@ sealed trait Stream[+A] {
       case Cons(h,t) => Cons(h, () => t().take(n-1))
     }
 
+  def takeViaUnfold(n: Int): Stream[A] =
+    unfold((this, n)) {
+      case (_, i) if i<=0 => None
+      case (Empty, _) => None
+      case (Cons(h,t), i) => Some((h(), (t(), i-1)))
+    }
+
   @annotation.tailrec
   final def drop(n: Int): Stream[A] =
     if (n<=0) this
