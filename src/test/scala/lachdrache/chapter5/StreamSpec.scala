@@ -126,7 +126,8 @@ class StreamSpec extends Specification {
     }
   }
 
-  "fibonacci numbers" should {
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/9.answer.scala answer]] */
+  "exercise 10: fibonacci numbers" should {
     {
       fibs.take(3).toList === List(1,1,2)
       fibs.take(7).toList === List(1,1,2,3,5,8,13)

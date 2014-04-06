@@ -115,10 +115,9 @@ object Stream {
 
   val fibs = {
     def fib(n0: Int, n1: Int):Stream[Int] = {
-      val n2 = n0+n1
-      cons(n2, fib(n1, n2))
+      cons(n0, fib(n1, n0+n1))
     }
-    cons(1, cons(1, fib(1,1)))
+    fib(1,1)
   }
 
   val ones: Stream[Int] = cons(1, ones)
