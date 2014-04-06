@@ -118,6 +118,22 @@ sealed trait Stream[+A] {
 
   def zip[B](bs: Stream[B]): Stream[(A,B)] =
     zipWith(bs)((_,_))
+
+  def zipAll[B](bs: Stream[B]): Stream[(Option[A], Option[B])] = {
+    def tail[T](s: Stream[T]) = s match {
+      case Empty => Empty
+      case Cons(_, t) => t()
+    }
+    unfold((this, bs)) {
+      case (s1, s2) => Some((s1.headOption, s2.headOption), (tail(s1), tail(s2)))
+    }
+  }
+
+  def zipAll2[B](bs: Stream[B]): Stream[(Option[A], Option[B])] = {
+    val s1 = this map (Some(_)) append constant(None)
+    val s2 = bs map (Some(_)) append constant(None)
+    s1 zip s2
+  }
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]

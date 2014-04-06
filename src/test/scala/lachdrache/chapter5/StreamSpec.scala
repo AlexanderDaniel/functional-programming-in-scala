@@ -360,9 +360,24 @@ class StreamSpec extends Specification {
       val s1 = Stream("a", "b", "c")
       val s2 = naturalNumbers
       s1.zip(s2).toList === List(("a", 1), ("b", 2), ("c", 3))
-
     }
   }
 
-  // TODO zipAll via unfold
+  "exercise 13: zipAll via unfold" should {
+    "zip the elements of two streams" in {
+      val s1 = Stream("a")
+      val s2 = naturalNumbers
+      s1.zipAll(s2).take(3).toList === List((Some("a"), Some(1)), (None, Some(2)), (None, Some(3)))
+    }
+  }
+
+  "exercise 13: zipAll2" should {
+    "zip the elements of two streams" in {
+      val s1 = Stream("a")
+      val s2 = naturalNumbers
+      s1.zipAll(s2).take(3).toList === List((Some("a"), Some(1)), (None, Some(2)), (None, Some(3)))
+    }
+  }
+
+  // answers to exercise 13 at https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/12.answer.scala
 }
