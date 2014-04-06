@@ -343,5 +343,17 @@ class StreamSpec extends Specification {
     (Stream(1, 2, 3).takeWhileViaUnfold(x => x < 1).toList === List()).eg
   }
 
-  // TODO takeWhile, zipWith and zipAll via unfold
+  "exercise 13: zipWith via unfold" should {
+    {
+      Stream(1,2,3).zipWith(Stream(3,2,1))(_+_).toList === List(4,4,4)
+    }.eg
+
+    "streams of different length" in {
+      val s1 = naturalNumbers take 5
+      val s2 = constant(10)
+      s1.zipWith(s2)(_+_).toList === List(11,12,13,14,15)
+    }
+  }
+
+  // TODO zipAll via unfold
 }
