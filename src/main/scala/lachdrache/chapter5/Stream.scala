@@ -108,11 +108,10 @@ object Stream {
     if (as.isEmpty) empty
     else cons(as.head, apply(as.tail: _*))
 
-  val naturalNumbers = {
-    def naturalNumbersFrom(n :Int): Stream[Int] =
-      cons(n, naturalNumbersFrom(n+1))
-    naturalNumbersFrom(1)
-  }
+  def from(n :Int): Stream[Int] =
+    cons(n, from(n+1))
+
+  val naturalNumbers = from(1)
 
   val fibs = {
     def fib(n0: Int, n1: Int):Stream[Int] = {
@@ -128,6 +127,5 @@ object Stream {
     lazy val stream: Stream[A] = cons(a, stream)
     stream
   }
-
 
 }

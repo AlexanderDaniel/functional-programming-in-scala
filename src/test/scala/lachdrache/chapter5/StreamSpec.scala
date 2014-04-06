@@ -263,4 +263,8 @@ class StreamSpec extends Specification {
     }.eg
   }
 
+  // I already did exercise 9 before it was mentioned :-)
+  // https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/8.answer.scala
+  // is still based on an old revision of the MEAP :-(
+
 }
