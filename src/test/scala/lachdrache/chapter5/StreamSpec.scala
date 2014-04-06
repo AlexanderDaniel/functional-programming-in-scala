@@ -268,4 +268,34 @@ class StreamSpec extends Specification {
   // https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/8.answer.scala
   // is still based on an old revision of the MEAP :-(
 
+  // Same for exercise 10. Can be found above
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/10.answer.scala answer]] */
+  "exercise 11: unfold" should {
+
+    "create a stream of 1s" in {
+      val streamOfOnes: Stream[Int] = unfold(1)(s => Some((s,s)))
+      streamOfOnes.take(5).toList === List(1,1,1,1,1)
+    }
+
+    "create the natural numbers" in {
+      val natural = unfold(1)(s => Some((s, s+1)))
+      natural.take(5).toList === List(1,2,3,4,5)
+    }
+
+    "fibonacci numbers" in {
+      val fib = unfold((0,1))(s => Some((s._1, (s._2, s._1+s._2))))
+      fib.take(8).toList === List(0,1,1,2,3,5,8,13)
+    }
+
+    "even numbers" in {
+      val even = unfold(0)(s => Some((s, s+2)))
+      even.take(4).toList === List(0,2,4,6)
+    }
+
+    "square of natural numbers" in {
+      val square = unfold(1)(s => Some((s*s, s+1)))
+      square.take(5).toList === List(1,4,9,16,25)
+    }
+  }
 }
