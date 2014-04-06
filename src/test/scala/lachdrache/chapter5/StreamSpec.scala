@@ -297,5 +297,13 @@ class StreamSpec extends Specification {
       val square = unfold(1)(s => Some((s*s, s+1)))
       square.take(5).toList === List(1,4,9,16,25)
     }
+
+    "stream from 5 to 1" in {
+      val fiveToZero = unfold(5) {
+        case 0 => None
+        case s => Some((s, s - 1))
+      }
+      fiveToZero.toList === List(5,4,3,2,1)
+    }
   }
 }
