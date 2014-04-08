@@ -380,4 +380,69 @@ class StreamSpec extends Specification {
   }
 
   // answers to exercise 13 at https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/12.answer.scala
+
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/13.answer.scala answer]]
+    * of the authors is in `startsWith2`
+    */
+  "exercise 14: startsWith" should {
+    {
+      Stream(1).startsWith(Stream()) === true
+    }.eg
+
+    {
+      Stream().startsWith(Stream()) === true
+    }.eg
+
+    {
+      Stream(1,2,3).startsWith(Stream(1,2)) === true
+    }.eg
+
+    {
+      Stream(1,2,3).startsWith(Stream(1,2,3)) === true
+    }.eg
+
+    {
+      Stream(1,2,3).startsWith(Stream(1)) === true
+    }.eg
+
+    {
+      Stream(1,2,3).startsWith(Stream(2)) === false
+    }.eg
+
+    {
+      Stream(1,2,3).startsWith(Stream(1,2,3,4)) === false
+    }.eg
+  }
+
+  "exercise 14: startsWith2" should {
+    {
+      startsWith2(Stream(1), Stream()) === true
+    }.eg
+
+    {
+      startsWith2(Stream(), Stream()) === true
+    }.eg
+
+    {
+      startsWith2(Stream(1,2,3), Stream(1,2)) === true
+    }.eg
+
+    {
+      startsWith2(Stream(1,2,3), Stream(1,2,3)) === true
+    }.eg
+
+    {
+      startsWith2(Stream(1,2,3), Stream(1)) === true
+    }.eg
+
+    {
+      startsWith2(Stream(1,2,3), Stream(2)) === false
+    }.eg
+
+    {
+      startsWith2(Stream(1,2,3), Stream(1,2,3,4)) === false
+    }.eg
+  }
+
 }

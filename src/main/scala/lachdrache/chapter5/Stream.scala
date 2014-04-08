@@ -134,6 +134,13 @@ sealed trait Stream[+A] {
     val s2 = bs map (Some(_)) append constant(None)
     s1 zip s2
   }
+
+  def startsWith[B >: A](s2: Stream[B]): Boolean = (this, s2) match {
+    case (_, Empty) => true
+    case (Cons(h1, t1), Cons(h2, t2)) if h1()==h2() => t1().startsWith(t2())
+    case _ => false
+  }
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -175,4 +182,9 @@ object Stream {
     case Some((a,s)) => cons(a, unfold(s)(f))
   }
 
+  def startsWith2[A](s1: Stream[A], s: Stream[A]): Boolean =
+    s1.zipAll(s).takeWhile(!_._2.isEmpty) forall {
+      case (Some(h),Some(h2)) if h == h2 => true
+      case _ => false
+    }
 }
