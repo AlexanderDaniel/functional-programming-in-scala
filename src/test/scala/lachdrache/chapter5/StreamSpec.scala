@@ -464,4 +464,22 @@ class StreamSpec extends Specification {
     }.eg
   }
 
+  "hasSubsequence" should {
+    {
+      Stream(1,2,3).hasSubsequence(Stream(2)) === true
+    }.eg
+
+    {
+      Stream(1,2,3).hasSubsequence(Stream(1,3)) === false
+    }.eg
+
+    {
+      Stream(1,2,3).hasSubsequence(Stream(1,2,3)) === true
+    }.eg
+
+    {
+      Stream(1,2,3).hasSubsequence(Stream()) === true
+    }.eg
+  }
+
 }
