@@ -445,4 +445,23 @@ class StreamSpec extends Specification {
     }.eg
   }
 
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/14.answer.scala answer]] */
+  "exercise 15: tails" should {
+    {
+      Stream().tails.map(_.toList).toList === List(List())
+    }.eg
+
+    {
+      Stream(1).tails.map(_.toList).toList === List(List(1), List())
+    }.eg
+
+    {
+      Stream(1,2).tails.map(_.toList).toList === List(List(1,2), List(2), List())
+    }.eg
+
+    {
+      Stream(1,2,3).tails.map(_.toList).toList === List(List(1,2,3), List(2,3), List(3), List())
+    }.eg
+  }
+
 }
