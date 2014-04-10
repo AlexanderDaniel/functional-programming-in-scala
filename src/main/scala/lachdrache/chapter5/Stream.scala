@@ -150,6 +150,46 @@ sealed trait Stream[+A] {
   def hasSubsequence[B >: A](s: Stream[B]): Boolean =
     tails exists (_ startsWith s)
 
+  def reverse: Stream[A] = {
+    @annotation.tailrec
+    def go(s: Stream[A], acc: Stream[A]): Stream[A] = s match {
+      case Empty => acc
+      case Cons(h,t) => go(t(), cons(h(), acc))
+    }
+    go(this, Empty)
+  }
+
+  def scanRightWithReverse[B](z: B)(f: (A,B) => B): Stream[B] =
+    cons(z,unfold((z, this.reverse)) {
+      case (_, Empty) => None
+      case (z0, Cons(h,t)) =>
+        val z1 = f(h(), z0)
+        Some((z1, (z1, t())))
+    }).reverse
+
+  def head: A = this match {
+    case Cons(h, _) => h()
+    case _ => throw new NoSuchElementException("No head in empty stream")
+  }
+
+  def scanRight[B](z: B)(f: (A,=>B) => B): Stream[B] =
+    foldRight(Stream(z)) { (a,z) =>
+      cons(f(a,z.head), z)
+    }
+
+  /** The function can't be implemented using `unfold`, since `unfold` generates elements of the `Stream` from left to right.
+    * It can be implemented using `foldRight` though.
+    *
+    * The implementation is just a `foldRight` that keeps the accumulated value and the stream of intermediate results,
+    * which we `cons` onto during each iteration. When writing folds, it's common to have more state in the fold than
+    * is needed to compute the result. Here, we simply extract the accumulated list once finished.
+    */
+  def scanRightAnswer[B](z: B)(f: (A,=>B) => B): Stream[B] =
+    foldRight((z, Stream(z)))((a,p) => {
+      val b2 = f(a,p._1)
+      (b2, cons(b2,p._2))
+    }) _2
+
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]

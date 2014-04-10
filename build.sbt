@@ -8,4 +8,4 @@ libraryDependencies ++= Seq(
   "org.specs2" %% "specs2" % "2.3.7" % "test"
 )
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+scalacOptions in Test ++= Seq("-Yrangepos", "-feature", "-language:postfixOps")

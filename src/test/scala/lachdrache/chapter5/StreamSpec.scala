@@ -482,4 +482,57 @@ class StreamSpec extends Specification {
     }.eg
   }
 
+  "reverse" should {
+    {
+      Stream().reverse.toList === List()
+    }.eg
+
+    {
+      Stream(1,2,3).reverse.toList === List(3,2,1)
+    }.eg
+  }
+
+  /**
+   * unfold traverses the stream from the left.
+   * scanRight should traverse it from the right.
+   * We might be able to use a trick similar to the one when
+   * we implemented foldRight via foldLeft.
+   *
+   * But in unfold one has to yield an element in each step.
+   * That's the difference between a scan and a fold.
+   *
+   * Let's try to implement it differently.
+   *
+   * What about reversing the stream? Can reverse be implemented with unfold?
+   * I don't think so.
+   *
+   * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/16.hint.txt hint]]
+   * and [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/laziness/16.answer.scala answer]]
+   */
+  "exercise 16: scanRight with reverse" should {
+    {
+      Stream(1,2,3).scanRightWithReverse(0)(_+_).toList === List(6,5,3,0)
+    }.eg
+  }
+
+  "exercise 16: scanRight with foldRight" should {
+    {
+      Stream(1,2,3).scanRight(0)(_+_).toList === List(6,5,3,0)
+    }.eg
+
+    {
+      Stream(3,2,1).scanRight(1)(_*_).toList === List(6,2,1,1)
+    }.eg
+  }
+
+  "exercise 16: scanRightAnswer" should {
+    {
+      Stream(1,2,3).scanRightAnswer(0)(_+_).toList === List(6,5,3,0)
+    }.eg
+
+    {
+      Stream(3,2,1).scanRightAnswer(1)(_*_).toList === List(6,2,1,1)
+    }.eg
+  }
+
 }
