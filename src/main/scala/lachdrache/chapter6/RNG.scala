@@ -82,4 +82,25 @@ object RNG {
   def doubleViaMap: Rand[Double] =
     map(nonNegativeInt)(i => i.toDouble / (Int.MaxValue.toDouble+1.0))
 
+  /** Why is this solution not correct?
+    * Because the rng is not passed for getting a random number for b
+    *
+    * We would need a flatMap to achieve that.
+    *
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/6.hint.txt hint]]
+    * and
+    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/6.answer.scala answer]]
+    */
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    val (a, _) = map(ra)(identity)
+    map(rb)(b => f(a,b))
+  }
+
+  def map2Answer[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    rng => {
+      val (a, r1) = ra(rng)
+      val (b, r2) = rb(r1)
+      (f(a, b), r2)
+    }
+
 }
