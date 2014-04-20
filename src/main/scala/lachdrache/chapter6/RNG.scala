@@ -49,7 +49,7 @@ object RNG {
   /** Exercise 4
     * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/4.answer.scala answer]]
     */
-  def int(count: Int)(rng: RNG): (List[Int], RNG) = {
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
     @annotation.tailrec
     def go(n: Int, acc: (List[Int], RNG)): (List[Int], RNG) =
       (n, acc) match {
@@ -82,25 +82,49 @@ object RNG {
   def doubleViaMap: Rand[Double] =
     map(nonNegativeInt)(i => i.toDouble / (Int.MaxValue.toDouble+1.0))
 
-  /** Why is this solution not correct?
-    * Because the rng is not passed for getting a random number for b
-    *
-    * We would need a flatMap to achieve that.
-    *
-    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/6.hint.txt hint]]
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/6.hint.txt hint]]
     * and
     * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/6.answer.scala answer]]
     */
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
-    val (a, _) = map(ra)(identity)
-    map(rb)(b => f(a,b))
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    rng => {
+      val (a, rng1) = ra(rng)
+      val (b, rng2) = rb(rng1)
+      (f(a, b), rng2)
+    }
   }
 
-  def map2Answer[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] =
+    map2(ra, rb)((_,_))
+  
+  val randIntDouble: Rand[(Int, Double)] =
+    both(int, double)
+  
+  val randDoubleInt: Rand[(Double, Int)] =
+    both(double, int)
+
+  def sequenceWithRecursion[A](rs: List[Rand[A]]): Rand[List[A]] = rs match {
+    case Nil => unit(Nil)
+    case h :: t => map2(h, sequenceWithRecursion(t))(_ :: _)
+  }
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(unit(List.empty[A]))((a,z) => map2(a,z)(_ :: _))
+  
+  def intsViaSequence(count: Int): Rand[List[Int]] =
+    sequence(List.fill(count)(int))
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
     rng => {
-      val (a, r1) = ra(rng)
-      val (b, r2) = rb(r1)
-      (f(a, b), r2)
+      val (a, rng1) = f(rng)
+      g(a)(rng1)
+    }
+
+  def notNegativeLessThan(n: Int): Rand[Int] =
+    flatMap(nonNegativeInt) { i =>
+      val mod = i % n
+      if (i + (n-1) - mod >= 0) unit(mod)
+      else notNegativeLessThan(n)
     }
 
 }
