@@ -21,6 +21,14 @@ class CandyDispenserSpec extends Specification {
     }
   }
 
+  "Turning the knob on an unlocked machine will cause it to dispense candy and become locked" should {
+    "knob on an unlocked machine" in {
+      val machine = CandyDispenser.simulateMachine(List(Turn))
+      val initialState = Machine(locked = false, coins = 0, candies = 13)
+      machine.run(initialState) === ((0,12), Machine(locked = true, coins=0, candies=12))
+    }
+  }
+
 //  "coin" should {
 //    {
 //      CandyDispenser.coin(unit((0,0))) === false
