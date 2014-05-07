@@ -292,8 +292,8 @@ class StreamSpec extends Specification {
     }
 
     "fibonacci numbers" in {
-      val fib = unfold((0, 1))(s => Some((s._1, (s._2, s._1 + s._2))))
-      fib.take(8).toList === List(0, 1, 1, 2, 3, 5, 8, 13)
+      val fibViaUnfold = unfold((0, 1))(s => Some((s._1, (s._2, s._1 + s._2))))
+      fibViaUnfold.take(8).toList === List(0, 1, 1, 2, 3, 5, 8, 13)
     }
 
     "even numbers" in {
