@@ -1,8 +1,11 @@
 package lachdrache.chapter7
 
-trait Par[A]
+import java.util.concurrent.{Callable, TimeUnit, Future, ExecutorService}
+
 
 object Par {
+
+  type Par[A] = ExecutorService => Future[A]
 
   def sumDivideAndConquer(ints: IndexedSeq[Int]): Int =
     if (ints.length<=1)
@@ -88,16 +91,6 @@ object Par {
 
   }
 
-  /** Exercise 1
-    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/parallelism/1.hint.txt hint]]
-    * and
-    * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/parallelism/1.answer.scala answer]]
-    */
-  def map2[A,B,C](a: Par[A], b: Par[B])(f: (A,B) => C): Par[C] =
-    ???
-
-  def fork[A](a: => Par[A]): Par[A] = ???
-
   object SumWithFork {
     def sum(ints: IndexedSeq[Int]): Par[Int] =
       if (ints.length<=1)
@@ -108,8 +101,30 @@ object Par {
       }
   }
 
-  def unit[A](a: A): Par[A] = ???
+  def unit[A](a: A): Par[A] =
+    (es: ExecutorService) => UnitFuture(a) // (1)
+
   def lazyUnit[A](a: => A): Par[A] = fork(unit(a))
 
-  def run[A](a: Par[A]): A = ???
+  def run[A](s: ExecutorService)(a: Par[A]): Future[A] =
+    a(s)
+
+  private case class UnitFuture[A](get: A) extends Future[A] {
+    override def isDone: Boolean = true
+    override def get(timeout: Long, unit: TimeUnit): A = get
+    override def isCancelled: Boolean = false
+    override def cancel(mayInterruptIfRunning: Boolean): Boolean = false
+  }
+
+  def map2[A,B,C](a: Par[A], b: Par[B])(f: (A,B) => C): Par[C] = // (2)
+    (es: ExecutorService) => {
+      val af = a(es)
+      val bf = b(es)
+      UnitFuture(f(af.get, bf.get)) // (3)
+    }
+
+  def fork[A](a: => Par[A]): Par[A] = // (4)
+    es => es.submit(new Callable[A] {
+      override def call(): A = a(es).get
+    })
 }
