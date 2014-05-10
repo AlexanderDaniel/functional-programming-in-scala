@@ -91,15 +91,13 @@ object Par {
 
   }
 
-  object SumWithFork {
-    def sum(ints: IndexedSeq[Int]): Par[Int] =
-      if (ints.length<=1)
-        Par.unit(ints.headOption getOrElse 0)
-      else {
-        val (l, r) = ints.splitAt(ints.length/2)
-        Par.map2(Par.fork(sum(l)), Par.fork(sum(r)))(_ + _)
-      }
-  }
+  def sum(ints: IndexedSeq[Int]): Par[Int] =
+    if (ints.length <= 1)
+      Par.unit(ints.headOption getOrElse 0)
+    else {
+      val (l, r) = ints.splitAt(ints.length / 2)
+      Par.map2(Par.fork(sum(l)), Par.fork(sum(r)))(_ + _)
+    }
 
   def unit[A](a: A): Par[A] =
     (es: ExecutorService) => UnitFuture(a) // (1)
@@ -127,4 +125,7 @@ object Par {
     es => es.submit(new Callable[A] {
       override def call(): A = a(es).get
     })
+
+  def asyncF[A,B](f: A => B): A => Par[B] =
+    a => lazyUnit(f(a))
 }
