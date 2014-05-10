@@ -51,6 +51,8 @@ class ParSpec extends FunSpec with BeforeAndAfterAll {
     }
   }
 
+  /** It would not terminate with a single thread executor because one thread blocks
+    * in `map2` when calling `get` */
   describe("map2 and fork") {
     it("should run thunks in parallel") {
       def one: String = {
