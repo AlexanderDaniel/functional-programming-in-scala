@@ -76,10 +76,10 @@ object Par {
 
     object ApplyingTheSubstitutionModel {
       sum(IndexedSeq(1,2,3,4))
-      Par.map2(sum(IndexedSeq(1,2)), sum(IndexedSeq(3,4)))
+      Par.map2(sum(IndexedSeq(1,2)), sum(IndexedSeq(3,4)))(_ + _)
       evaluating(sum(IndexedSeq(1,2))) {
-        Par.map2(sum(IndexedSeq(1)), sum(IndexedSeq(2)))
-        Par.map2(Par.unit(1), Par.unit(2))
+        Par.map2(sum(IndexedSeq(1)), sum(IndexedSeq(2)))(_ + _)
+        Par.map2(Par.unit(1), Par.unit(2))(_ + _)
       }
       evaluating(sum(IndexedSeq(3,4))) {
         // ...
@@ -110,4 +110,6 @@ object Par {
 
   def unit[A](a: A): Par[A] = ???
   def lazyUnit[A](a: => A): Par[A] = fork(unit(a))
+
+  def run[A](a: Par[A]): A = ???
 }
