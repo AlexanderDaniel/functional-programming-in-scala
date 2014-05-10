@@ -12,7 +12,8 @@ object Par {
       sumDivideAndConquer(left) + sumDivideAndConquer(right)
     }
 
-  def unit[A](a: => A): Par[A] = ???
+  // Replaced by strict version version and lazyUnit below
+  // def unit[A](a: => A): Par[A] = ???
   def get[A](a: Par[A]): A = ???
 
   object SumWithUnitAndGet {
@@ -105,6 +106,8 @@ object Par {
         val (l, r) = ints.splitAt(ints.length/2)
         Par.map2(Par.fork(sum(l)), Par.fork(sum(r)))(_ + _)
       }
-
   }
+
+  def unit[A](a: A): Par[A] = ???
+  def lazyUnit[A](a: => A): Par[A] = fork(unit(a))
 }
