@@ -4,9 +4,6 @@ trait Par[A]
 
 object Par {
 
-  def unit[A](a: => A): Par[A] = ???
-  def get[A](a: Par[A]): A = ???
-
   def sumDivideAndConquer(ints: IndexedSeq[Int]): Int =
     if (ints.length<=1)
       ints.headOption getOrElse 0
@@ -14,6 +11,9 @@ object Par {
       val (left, right) = ints.splitAt(ints.length/2)
       sumDivideAndConquer(left) + sumDivideAndConquer(right)
     }
+
+  def unit[A](a: => A): Par[A] = ???
+  def get[A](a: Par[A]): A = ???
 
   object SumWithUnitAndGet {
     def sum(ints: IndexedSeq[Int]): Int =
@@ -47,6 +47,45 @@ object Par {
       }
   }
 
+  object SumReturningPar {
+    def sum(ints: IndexedSeq[Int]): Par[Int] =
+      if (ints.length<=1)
+        Par.unit(ints.headOption getOrElse 0)
+      else {
+        val (l, r) = ints.splitAt(ints.length/2)
+        val sumL: Par[Int] = sum(l)
+        val sumR: Par[Int] = sum(r)
+        Par.map2(sumL, sumR)(_ + _)
+      }
+  }
+
+  /** Note: now we can inline the calls to sum */
+  object SumReturningParWithInlinedSums {
+    def sum(ints: IndexedSeq[Int]): Par[Int] =
+      if (ints.length<=1)
+        Par.unit(ints.headOption getOrElse 0)
+      else {
+        val (l, r) = ints.splitAt(ints.length/2)
+        Par.map2(sum(l), sum(r))(_ + _)
+      }
+
+    def evaluating(name: => Unit)(thunk: => Unit): Unit = {
+      ()
+    }
+
+    object ApplyingTheSubstitutionModel {
+      sum(IndexedSeq(1,2,3,4))
+      Par.map2(sum(IndexedSeq(1,2)), sum(IndexedSeq(3,4)))
+      evaluating(sum(IndexedSeq(1,2))) {
+        Par.map2(sum(IndexedSeq(1)), sum(IndexedSeq(2)))
+        Par.map2(Par.unit(1), Par.unit(2))
+      }
+      evaluating(sum(IndexedSeq(3,4))) {
+        // ...
+      }
+    }
+
+  }
 
   /** Exercise 1
     * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/parallelism/1.hint.txt hint]]
@@ -56,5 +95,16 @@ object Par {
   def map2[A,B,C](a: Par[A], b: Par[B])(f: (A,B) => C): Par[C] =
     ???
 
+  def fork[A](a: => Par[A]): Par[A] = ???
 
+  object SumWithFork {
+    def sum(ints: IndexedSeq[Int]): Par[Int] =
+      if (ints.length<=1)
+        Par.unit(ints.headOption getOrElse 0)
+      else {
+        val (l, r) = ints.splitAt(ints.length/2)
+        Par.map2(Par.fork(sum(l)), Par.fork(sum(r)))(_ + _)
+      }
+
+  }
 }
