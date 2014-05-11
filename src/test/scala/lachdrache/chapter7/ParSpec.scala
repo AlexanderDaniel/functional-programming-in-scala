@@ -70,13 +70,56 @@ class ParSpec extends FunSpec with BeforeAndAfterAll {
           future.get()
         }
       }
-      println(s"Took $millis ms")
+      println(s"map2 and fork took $millis ms")
       assert(millis < 3*1000*1000)
     }
   }
 
   assertSortPar("sortPar via map2", Par.sortParViaMap2)
   assertSortPar("sortPar via map", Par.sortParViaMap)
+
+  assertParMap("parMap", Par.parMap)
+  assertParMap("parMap via foldRight and map2", Par.parMapViaFoldRightAndMap2)
+  assertParMap("parMap using asyncF", Par.parMapUsingAsyncF)
+
+  describe("sequence") {
+    it("converts a list of Par to a Par of a list") {
+      val listOfPar: List[Par[Int]] = List(1,2,3,4,5,6,7,8,9) map asyncF(_+10)
+      val par: Par[List[Int]] = sequence(listOfPar)
+      val future: Future[List[Int]] = Par.run(es)(par)
+      assertResult(List(11,12,13,14,15,16,17,18,19)) {
+        future.get()
+      }
+    }
+  }
+
+  assertParMap("parMap using sequence", Par.parMapUsingSequence)
+
+  private def assertParMap(name: String, parMap: List[Int] => (Int => Int) => Par[List[Int]]) {
+    describe(name) {
+      it("applies f to each element of the list") {
+        val par: Par[List[Int]] = parMap(List(1, 2, 3, 4, 5, 6, 7, 8, 9))(_ + 10)
+        val future: Future[List[Int]] = Par.run(es)(par)
+        assertResult(List(11, 12, 13, 14, 15, 16, 17, 18, 19)) {
+          future.get()
+        }
+      }
+      it("should run all operations in parallel") {
+        val (_, millis) = timeIt {
+          val par: Par[List[Int]] = parMap(List(1, 2, 3, 4, 5, 6, 7, 8, 9))(a => {
+            TimeUnit.SECONDS.sleep(1)
+            a + 10
+          })
+          val future: Future[List[Int]] = Par.run(es)(par)
+          assertResult(List(11, 12, 13, 14, 15, 16, 17, 18, 19)) {
+            future.get()
+          }
+        }
+        println(s"$name took $millis ms")
+        assert(millis < 2 * 1000 * 1000)
+      }
+    }
+  }
 
   private def assertSortPar(name: String, sortPar: Par[List[Int]] => Par[List[Int]]) {
     describe(name) {

@@ -138,4 +138,38 @@ object Par {
   def sortParViaMap(parList: Par[List[Int]]): Par[List[Int]] =
     map(parList)(l => l.sorted)
 
+  /** For me it is hard to see why this version with foldRight runs everything in parallel */
+  def parMapViaFoldRightAndMap2[A,B](l: List[A])(f: A => B): Par[List[B]] =
+    l.foldRight(unit(List.empty[B])) { (a, b) =>
+      map2(fork(unit(f(a))), b)((a, b) => a :: b)
+    }
+
+  def parMap[A,B](l: List[A])(f: A => B): Par[List[B]] = l match {
+    case Nil => unit(Nil)
+    case a :: as =>
+      val b: Par[B] = fork(unit(f(a)))
+      val bs: Par[List[B]] = fork(parMap(as)(f))
+      map2(b, bs)(_ :: _)
+  }
+
+  def parMapUsingAsyncF[A,B](l: List[A])(f: A => B): Par[List[B]] = l match {
+    case Nil => unit(Nil)
+    case a :: as =>
+      val b: Par[B] = asyncF(f)(a)
+      val bs: Par[List[B]] = fork(parMap(as)(f))
+      map2(b, bs)(_ :: _)
+  }
+
+  /** [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/parallelism/5.answer.scala answer]] */
+  def sequence[A](ps: List[Par[A]]): Par[List[A]] =
+    ps.foldRight(unit(List.empty[A])) { (pa, pb) =>
+      map2(pa, pb)(_ :: _)
+    }
+
+  def parMapUsingSequence[A,B](l: List[A])(f: A => B): Par[List[B]] =
+    fork {
+      sequence(
+        l map asyncF(f)
+      )
+    }
 }
