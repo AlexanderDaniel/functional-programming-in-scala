@@ -129,6 +129,13 @@ object Par {
   def asyncF[A,B](f: A => B): A => Par[B] =
     a => lazyUnit(f(a))
 
-  def sortPar(parList: Par[List[Int]]): Par[List[Int]] =
+  def sortParViaMap2(parList: Par[List[Int]]): Par[List[Int]] =
     map2(parList, unit(()))((l, _) => l.sorted)
+  
+  def map[A,B](pa: Par[A])(f: A => B): Par[B] =
+    map2(pa, unit(()))((a,_) => f(a))
+
+  def sortParViaMap(parList: Par[List[Int]]): Par[List[Int]] =
+    map(parList)(l => l.sorted)
+
 }
