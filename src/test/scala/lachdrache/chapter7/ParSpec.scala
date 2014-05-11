@@ -75,6 +75,16 @@ class ParSpec extends FunSpec with BeforeAndAfterAll {
     }
   }
 
+  describe("sortPar") {
+    it("should sort the list in the par") {
+      val par: Par[List[Int]] = sortPar(unit(List(4,1,3,2)))
+      val future: Future[List[Int]] = Par.run(es)(par)
+      assertResult(List(1,2,3,4)) {
+        future.get()
+      }
+    }
+  }
+
   private def timeIt[A](thunk: => A): (A, Long) = {
     val startMillis = System.currentTimeMillis()
     var endMillis = 0L
