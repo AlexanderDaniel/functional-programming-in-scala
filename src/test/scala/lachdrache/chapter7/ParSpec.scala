@@ -95,6 +95,21 @@ class ParSpec extends FunSpec with BeforeAndAfterAll {
 
   assertParMap("parMap using sequence", Par.parMapUsingSequence)
 
+  assertParFilter("parFilter my version", Par.parFilter)
+  assertParFilter("parFilter the answer", Par.parFilterAnswer)
+
+  def assertParFilter(name: String, parFilter: List[Int] => (Int => Boolean) => Par[List[Int]]) {
+    describe(name) {
+      it("should filter if predicate evals to true") {
+        val par: Par[List[Int]] = parFilter(List(1, 2, 3, 4, 5, 6, 7, 8, 9))(_ % 2 == 0)
+        val future: Future[List[Int]] = Par.run(es)(par)
+        assertResult(List(2, 4, 6, 8)) {
+          future.get()
+        }
+      }
+    }
+  }
+
   private def assertParMap(name: String, parMap: List[Int] => (Int => Int) => Par[List[Int]]) {
     describe(name) {
       it("applies f to each element of the list") {

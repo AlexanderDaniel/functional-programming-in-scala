@@ -172,4 +172,20 @@ object Par {
         l map asyncF(f)
       )
     }
+
+  def parFilter[A](l: List[A])(p: A => Boolean): Par[List[A]] =
+    fork {
+      val ps: List[Par[(A, Boolean)]] = l map asyncF(a => (a, p(a)))
+      map(sequence(ps)) { l =>
+        l filter { case (_, b) => b } map { case (a, _) => a }
+      }
+    }
+
+  def parFilterAnswer[A](l: List[A])(p: A => Boolean): Par[List[A]] = {
+    val pars: List[Par[List[A]]] = l map asyncF { (a: A) =>
+      if (p(a)) List(a) else List()
+    }
+    map(sequence(pars))(_.flatten)
+  }
+
 }
