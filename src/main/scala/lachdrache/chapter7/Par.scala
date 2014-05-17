@@ -196,4 +196,10 @@ object Par {
   def choiceViaChoiceN[A](p: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
     choiceN(map(p)(b => if (b) 1 else 0))(List(f,t))
 
+  def chooser[A,B](pa: Par[A])(choices: A => Par[B]) =
+    (es: ExecutorService) => {
+      val a: A = run(es)(pa).get
+      choices(a)(es)
+    }
+
 }
