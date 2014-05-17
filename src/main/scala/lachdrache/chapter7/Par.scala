@@ -202,4 +202,23 @@ object Par {
       choices(a)(es)
     }
 
+  def flatMap[A,B](pa: Par[A])(choices: A => Par[B]): Par[B] =
+    es => {
+      val a: A = run(es)(pa).get
+      run(es)(choices(a))
+    }
+
+  def join[A](ppa: Par[Par[A]]): Par[A] =
+    es => {
+      val pa: Par[A] = run(es)(ppa).get()
+      run(es)(pa)
+    }
+
+  def flatMapViaJoin[A,B](pa: Par[A])(choices: A => Par[B]): Par[B] =
+    join(
+      map(pa)(choices)
+    )
+
+  def joinViaFlatMap[A](ppa: Par[Par[A]]): Par[A] =
+    flatMap(ppa)(identity)
 }
