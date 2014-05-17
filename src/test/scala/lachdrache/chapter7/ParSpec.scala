@@ -98,7 +98,7 @@ class ParSpec extends FunSpec with BeforeAndAfterAll {
   assertParFilter("parFilter my version", Par.parFilter)
   assertParFilter("parFilter the answer", Par.parFilterAnswer)
 
-  def assertParFilter(name: String, parFilter: List[Int] => (Int => Boolean) => Par[List[Int]]) {
+  private def assertParFilter(name: String, parFilter: List[Int] => (Int => Boolean) => Par[List[Int]]) {
     describe(name) {
       it("should filter if predicate evals to true") {
         val par: Par[List[Int]] = parFilter(List(1, 2, 3, 4, 5, 6, 7, 8, 9))(_ % 2 == 0)
