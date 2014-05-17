@@ -4,7 +4,6 @@ import java.util.concurrent.{Callable, TimeUnit, Future, ExecutorService}
 
 
 object Par {
-
   type Par[A] = ExecutorService => Future[A]
 
   def sumDivideAndConquer(ints: IndexedSeq[Int]): Int =
@@ -187,5 +186,14 @@ object Par {
     }
     map(sequence(pars))(_.flatten)
   }
+
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
+    es => {
+      val i: Int = run(es)(n).get
+      choices(i)(es)
+    }
+
+  def choiceViaChoiceN[A](p: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+    choiceN(map(p)(b => if (b) 1 else 0))(List(f,t))
 
 }
