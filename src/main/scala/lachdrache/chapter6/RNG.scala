@@ -14,6 +14,11 @@ object RNG {
     (if (n < 0) -(n + 1) else n, rng1)
   }
 
+  def boolean(rng: RNG): (Boolean, RNG) = {
+    val (n, rng1) = rng.nextInt
+    (n<0, rng1)
+  }
+
   /** Exercise 2
     * [[https://github.com/pchiusano/fpinscala/blob/master/answerkey/state/2.hint.txt hint]]
     * and
