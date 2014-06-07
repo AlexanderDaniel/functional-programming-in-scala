@@ -4,7 +4,22 @@ import lachdrache.chapter8.Prop._
 import lachdrache.chapter6.RNG
 import lachdrache.chapter5.Stream
 
-case class Prop(run: (TestCases, RNG) => Result)
+case class Prop(run: (TestCases, RNG) => Result) {
+  def &&(p: Prop): Prop = Prop {
+    (n, rng) => run(n, rng) match {
+      case None => p.run(n, rng)
+      case x => x
+    }
+  }
+
+  def ||(p: Prop): Prop = Prop {
+    (n,rng) => run(n, rng) match {
+      case Some(_) => p.run(n,rng)
+      case x => x
+    }
+  }
+
+}
 
 object Prop {
   type FailedCase = String
