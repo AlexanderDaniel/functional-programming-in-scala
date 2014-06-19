@@ -5,28 +5,37 @@ import scala.util.matching.Regex
 
 trait Parsers[ParseError, Parser[+ _]] {
   self =>
-
   def run[A](p: Parser[A])(input: String): Either[ParseError, A]
 
-  /** Recognize and return a single String*/
-  implicit def string(s: String): Parser[String]
-  implicit def regex(r: Regex): Parser[String]
   implicit def operators[A](p: Parser[A]) = ParserOps[A](p)
   implicit def asStringParser[A](a: A)(implicit f: A => Parser[String]): ParserOps[String] =
     ParserOps(f(a))
 
-  def char(c: Char): Parser[Char] =
-    string(c.toString) map (_.charAt(0))
+  // primitives start
+
+  /** Recognize and return a single String*/
+  implicit def string(s: String): Parser[String]
+
+  implicit def regex(r: Regex): Parser[String]
+
+  /** Return the portion of input inspected by p if successful */
+  def slice[A](p: Parser[A]): Parser[String]
 
   /** Always succeed with the value a */
   def succeed[A](a: A): Parser[A] =
     string("") map (_ => a)
 
-  /** Return the portion of input inspected by p if successful */
-  def slice[A](p: Parser[A]): Parser[String]
-
   /** Choose between two parsers, first attempting p1, then o2 if p1 fails */
   def or[A](p1: Parser[A], p2: => Parser[A]): Parser[A]
+
+  def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B]
+
+  // primitives end
+
+  def char(c: Char): Parser[Char] =
+    string(c.toString) map (_.charAt(0))
+
+
 
   def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] =
     n match {
@@ -45,15 +54,35 @@ trait Parsers[ParseError, Parser[+ _]] {
     map2(p, many(p))(_ :: _)
 
   /** Sequence two parsers, running p1, than p2 and return the pair of their results if both succeed */
-  def product[A, B](p: Parser[A], p2: => Parser[B]): Parser[(A, B)]
+  def product[A, B](p: Parser[A], p2: => Parser[B]): Parser[(A, B)] =
+    for {
+      a <- p
+      b <- p2
+    } yield (a,b)
 
   /** Apply the function fto the result of p, if successful */
-  def map[A, B](a: Parser[A])(f: A => B): Parser[B]
+  def map[A, B](pa: Parser[A])(f: A => B): Parser[B] =
+    pa flatMap { a =>
+      succeed(f(a))
+    }
 
   def map2[A, B, C](pa: Parser[A], pb: => Parser[B])(f: (A, B) => C): Parser[C] =
-    (pa ** pb) map f.tupled
+    pa flatMap { a =>
+      pb map { b =>
+        f(a,b)
+      }
+    }
 
-  def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B]
+  def number: Parser[Double] =
+    """\d+(.\d*)?""".r map (_.toDouble)
+
+  def stringLiteral: Parser[String] =
+    quote ** """\w+""" ** quote map { case ((_, name), _) =>
+      name
+    }
+
+  def quote: Parser[String] =
+    """""""
 
   def num(c: Char): Parser[Int] = {
     char(c).many.slice map (_.size)
