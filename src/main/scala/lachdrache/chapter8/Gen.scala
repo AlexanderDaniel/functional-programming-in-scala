@@ -14,6 +14,11 @@ case class Gen[A](sample: State[RNG,A]) {
       Gen.listOfN(s, this)
     }
 
+  def unsized: SGen[A] = SGen(_ => this)
+
+  def listOfN(size: Int): Gen[List[A]] =
+    Gen.listOfN(size, this)
+
 }
 
 object Gen {
@@ -43,10 +48,14 @@ object Gen {
     }
   }
 
+
   def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] =
     Gen.boolean flatMap { b =>
       if (b) g1 else g2
     }
+
+  def listOf[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => g.listOfN(n))
 
   private def isSameParity(a: Int, b: Int): Boolean =
     even(a)&&even(b) || odd(a)&&odd(b)
