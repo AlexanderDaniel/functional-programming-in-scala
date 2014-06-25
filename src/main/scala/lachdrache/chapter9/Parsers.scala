@@ -60,6 +60,11 @@ trait Parsers[ParseError, Parser[+ _]] {
       b <- p2
     } yield (a,b)
 
+  def whitespace: Parser[String] = """\s*""".r
+  def productIgnoringWhitespace[A,B](pa: Parser[A], pb: Parser[B]): Parser[(A,B)] =
+    pa ** whitespace ** pb map { case ((a, _), b) =>
+      (a,b)
+    }
   /** Apply the function fto the result of p, if successful */
   def map[A, B](pa: Parser[A])(f: A => B): Parser[B] =
     pa flatMap { a =>
@@ -76,8 +81,9 @@ trait Parsers[ParseError, Parser[+ _]] {
   def number: Parser[Double] =
     """\d+(.\d*)?""".r map (_.toDouble)
 
+  /** No support of escaping the double quote */
   def stringLiteral: Parser[String] =
-    quote ** """\w+""" ** quote map { case ((_, name), _) =>
+    quote ** """[^"]*""".r ** quote map { case ((_, name), _) =>
       name
     }
 
@@ -116,6 +122,7 @@ trait Parsers[ParseError, Parser[+ _]] {
     def product[B](p2: Parser[B]) = self.product(p, p2)
 
     def **[B](p2: Parser[B]) = self.product(p, p2)
+    def ***[B](pb: Parser[B]) = self.productIgnoringWhitespace(p, pb)
 
     def flatMap[B](f: A=> Parser[B]) = self.flatMap(p)(f)
   }
