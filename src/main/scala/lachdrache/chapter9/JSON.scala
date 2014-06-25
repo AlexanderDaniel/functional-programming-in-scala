@@ -15,7 +15,7 @@ object JSON {
   /**
    * No leading and trailing whitespace supported
    */
-  def jsonParser[ParseError, Parser[+ _]](P: Parsers[ParseError, Parser]): Parser[JSON] = {
+  def jsonParser[ParseError, Parser[+ _]](P: Parsers[Parser]): Parser[JSON] = {
     import P._
 
     def jNumber: Parser[JNumber] =
