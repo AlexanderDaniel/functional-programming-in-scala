@@ -73,6 +73,7 @@ object JSON {
     json
 
     // TODO Create new combinator repetition with separator to simplify jArray and jObject definition
+    // TODO The literal null is missing
   }
 }
 
