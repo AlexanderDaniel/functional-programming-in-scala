@@ -20,21 +20,24 @@ trait Parsers[ParseError, Parser[+ _]] { self =>
   /** Return the portion of input inspected by p if successful */
   def slice[A](p: Parser[A]): Parser[String]
 
-  /** Always succeed with the value a */
-  def succeed[A](a: A): Parser[A] =
-    string("") map (_ => a)
+  def label[A](msg: String)(p: Parser[A]): Parser[A]
+  def scope[A](msg: String)(p: Parser[A]): Parser[A]
+
+  def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B]
+
+  def attempt[A](p: Parser[A]): Parser[A]
 
   /** Choose between two parsers, first attempting p1, then o2 if p1 fails */
   def or[A](p1: Parser[A], p2: => Parser[A]): Parser[A]
 
-  def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B]
-
   // primitives end
+
+  /** Always succeed with the value a */
+  def succeed[A](a: A): Parser[A] =
+    string("") map (_ => a)
 
   def char(c: Char): Parser[Char] =
     string(c.toString) map (_.charAt(0))
-
-
 
   def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] =
     n match {
