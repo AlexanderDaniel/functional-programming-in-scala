@@ -3,8 +3,7 @@ package lachdrache.chapter9
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.matching.Regex
 
-trait Parsers[ParseError, Parser[+ _]] {
-  self =>
+trait Parsers[ParseError, Parser[+ _]] { self =>
   def run[A](p: Parser[A])(input: String): Either[ParseError, A]
 
   implicit def operators[A](p: Parser[A]) = ParserOps[A](p)
