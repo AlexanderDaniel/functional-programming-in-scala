@@ -71,6 +71,8 @@ object JSON {
     def json: Parser[JSON] = jNumber | jString | jBoolean | jArray | jObject
 
     json
+
+    // TODO Create new combinator repetition with separator to simplify jArray and jObject definition
   }
 }
 
