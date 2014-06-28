@@ -8,7 +8,12 @@ import scala.language.implicitConversions
 object MyParsersTypes {
   type Parser[+A] = Location => Result[A]
 
-  trait Result [+A]
+  trait Result [+A] {
+    def mapError(f: ParseError => ParseError): Result[A] = this match {
+      case Failure(e) => Failure(f(e))
+      case _ => this
+    }
+  }
   case class Success[+A](get: A, charsConsumed: Int) extends Result[A]
   case class Failure(get: ParseError) extends Result[Nothing]
 }
@@ -35,8 +40,6 @@ object MyParsers extends Parsers[Parser] {
       else Failure(location.toError(s"$s expected"))
     }
 
-  override def scope[A](msg: String)(p: Parser[A]): Parser[A] = ???
-
   override implicit def regex(r: Regex): Parser[String] =
     location => {
       r.findPrefixOf(location.currentInput)
@@ -53,7 +56,12 @@ object MyParsers extends Parsers[Parser] {
       }
     }
 
-  override def label[A](msg: String)(p: Parser[A]): Parser[A] = ???
+  override def scope[A](msg: String)(p: Parser[A]): Parser[A] =
+    loc => p(loc).mapError(_.push(loc, msg))
 
+  override def label[A](msg: String)(p: Parser[A]): Parser[A] =
+    loc => p(loc).mapError(_.label(msg))
+
+  /** attempt{p) converts committed failures of p to uncommitted failures */
   override def attempt[A](p: Parser[A]): Parser[A] = ???
 }
