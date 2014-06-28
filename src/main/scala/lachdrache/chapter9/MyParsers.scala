@@ -10,28 +10,24 @@ object MyParsersTypes {
 
   trait Result [+A] {
     def mapError(f: ParseError => ParseError): Result[A] = this match {
-      case Failure(e) => Failure(f(e))
+      case Failure(e, c) => Failure(f(e), c)
+      case _ => this
+    }
+    def uncommit: Result[A] = this match {
+      case Failure(e, true) => Failure(e, false)
+      case _ => this
+    }
+    def addCommit(isCommitted: Boolean): Result[A] = this match {
+      case Failure(e, false) if isCommitted => Failure(e, true)
       case _ => this
     }
   }
   case class Success[+A](get: A, charsConsumed: Int) extends Result[A]
-  case class Failure(get: ParseError) extends Result[Nothing]
+  case class Failure(get: ParseError, isCommitted: Boolean=true) extends Result[Nothing]
 }
 
 object MyParsers extends Parsers[Parser] {
   override def run[A](p: Parser[A])(input: String): Either[ParseError, A] = ???
-
-  override def flatMap[A, B](p: Parser[A])(f: (A) => Parser[B]): Parser[B] =
-    location => {
-      val result = p(location)
-      result match {
-        case Success(a, charsConsumed) => f(a)(location.advanceBy(charsConsumed))
-        case Failure(parseError) => Failure(parseError)
-      }
-    }
-
-  /** Choose between two parsers, first attempting p1, then o2 if p1 fails */
-  override def or[A](p1: Parser[A], p2: => Parser[A]): Parser[A] = ???
 
   /** Recognize and return a single String */
   override implicit def string(s: String): Parser[String] =
@@ -52,7 +48,7 @@ object MyParsers extends Parsers[Parser] {
     location => {
       p(location) match {
         case Success(_, charsConsumed) => Success(location.currentInput.take(charsConsumed), 0)
-        case Failure(parseError) => Failure(parseError)
+        case Failure(parseError, committed) => Failure(parseError, committed)
       }
     }
 
@@ -64,4 +60,21 @@ object MyParsers extends Parsers[Parser] {
 
   /** attempt{p) converts committed failures of p to uncommitted failures */
   override def attempt[A](p: Parser[A]): Parser[A] = ???
+
+  /** Choose between two parsers, first attempting p1, then o2 if p1 fails */
+  override def or[A](x: Parser[A], y: => Parser[A]): Parser[A] =
+    loc => x(loc) match {
+      case r@Failure(e, committed) if committed => y(loc)
+      case r => r
+    }
+
+  override def flatMap[A, B](p: Parser[A])(f: (A) => Parser[B]): Parser[B] =
+    location => {
+      p(location) match {
+        case Success(a, charsConsumed) => f(a)(location.advanceBy(charsConsumed)).addCommit(charsConsumed==0)
+        case e@Failure(_,_) => e
+      }
+    }
+
+
 }
