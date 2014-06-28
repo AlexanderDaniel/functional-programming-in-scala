@@ -1,52 +1,59 @@
 package lachdrache.chapter9
 
+import MyParsersTypes._
+
 import scala.util.matching.Regex
 import scala.language.implicitConversions
 
-trait MyParser[+A] {
-  def run(input: String): (Either[ParseError, A], String)
+object MyParsersTypes {
+  type Parser[+A] = Location => Result[A]
+
+  trait Result [+A]
+  case class Success[+A](get: A, charsConsumed: Int) extends Result[A]
+  case class Failure(get: ParseError) extends Result[Nothing]
 }
 
-object MyParsers extends Parsers[MyParser] {
-  override def run[A](p: MyParser[A])(input: String): Either[ParseError, A] =
-    p.run(input)._1
+object MyParsers extends Parsers[Parser] {
+  override def run[A](p: Parser[A])(input: String): Either[ParseError, A] = ???
 
-  override def flatMap[A, B](p: MyParser[A])(f: (A) => MyParser[B]): MyParser[B] =
-    new MyParser[B] {
-      override def run(input: String) = {
-        val (o1, r1) = p.run(input)
-        o1.fold(
-          parseError => (Left(parseError), input),
-          a => f(a).run(r1)
-        )
+  override def flatMap[A, B](p: Parser[A])(f: (A) => Parser[B]): Parser[B] =
+    location => {
+      val result = p(location)
+      result match {
+        case Success(a, charsConsumed) => f(a)(location.advanceBy(charsConsumed))
+        case Failure(parseError) => Failure(parseError)
       }
     }
 
   /** Choose between two parsers, first attempting p1, then o2 if p1 fails */
-  override def or[A](p1: MyParser[A], p2: => MyParser[A]): MyParser[A] = ???
+  override def or[A](p1: Parser[A], p2: => Parser[A]): Parser[A] = ???
 
   /** Recognize and return a single String */
-  override implicit def string(s: String): MyParser[String] =
-    new MyParser[String] {
-      override def run(input: String) =
-        if (input.startsWith(s)) (Right(s), input.drop(s.length))
-        else (Left(ParseError()), input)
+  override implicit def string(s: String): Parser[String] =
+    location => {
+      if (location.currentInput.startsWith(s)) Success(s, s.length)
+      else Failure(location.toError(s"$s expected"))
     }
 
-  override def scope[A](msg: String)(p: MyParser[A]): MyParser[A] = ???
+  override def scope[A](msg: String)(p: Parser[A]): Parser[A] = ???
 
-  override implicit def regex(r: Regex): MyParser[String] =
-    new MyParser[String] {
-      override def run(input: String) =
-        r.findPrefixOf(input)
-          .map(matchedStr => (Right(matchedStr), input.drop(matchedStr.length)))
-          .getOrElse((Left(ParseError()), input))
+  override implicit def regex(r: Regex): Parser[String] =
+    location => {
+      r.findPrefixOf(location.currentInput)
+        .map { s => Success(s, s.length)}
+        .getOrElse { Failure(location.toError(s"Regex $r expected"))}
     }
 
   /** Return the portion of input inspected by p if successful */
-  override def slice[A](p: MyParser[A]): MyParser[String] = ???
+  override def slice[A](p: Parser[A]): Parser[String] =
+    location => {
+      p(location) match {
+        case Success(_, charsConsumed) => Success(location.currentInput.take(charsConsumed), 0)
+        case Failure(parseError) => Failure(parseError)
+      }
+    }
 
-  override def label[A](msg: String)(p: MyParser[A]): MyParser[A] = ???
+  override def label[A](msg: String)(p: Parser[A]): Parser[A] = ???
 
-  override def attempt[A](p: MyParser[A]): MyParser[A] = ???
+  override def attempt[A](p: Parser[A]): Parser[A] = ???
 }
