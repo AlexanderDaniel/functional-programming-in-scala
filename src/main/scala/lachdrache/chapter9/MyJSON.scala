@@ -2,20 +2,20 @@ package lachdrache.chapter9
 
 import scala.language.higherKinds
 
-trait JSON
+trait MyJSON
 
-object JSON {
-  case object JNull extends JSON
-  case class JNumber(get: Double) extends JSON
-  case class JString(get: String) extends JSON
-  case class JBool(get: Boolean) extends JSON
-  case class JArray(get: IndexedSeq[JSON]) extends JSON
-  case class JObject(get: Map[String, JSON]) extends JSON
+object MyJSON {
+  case object JNull extends MyJSON
+  case class JNumber(get: Double) extends MyJSON
+  case class JString(get: String) extends MyJSON
+  case class JBool(get: Boolean) extends MyJSON
+  case class JArray(get: IndexedSeq[MyJSON]) extends MyJSON
+  case class JObject(get: Map[String, MyJSON]) extends MyJSON
 
   /**
    * No leading and trailing whitespace supported
    */
-  def jsonParser[ParseError, Parser[+ _]](P: Parsers[Parser]): Parser[JSON] = {
+  def jsonParser[ParseError, Parser[+ _]](P: Parsers[Parser]): Parser[MyJSON] = {
     import P._
 
     def jNumber: Parser[JNumber] =
@@ -29,10 +29,10 @@ object JSON {
     def jString: Parser[JString] =
       stringLiteral map (JString(_))
 
-    def leadingSeparatorWithJson: Parser[JSON] =
+    def leadingSeparatorWithJson: Parser[MyJSON] =
       ("," *** json) map { case (_, json) => json }
 
-    def manyLeadingSeparatorWithJson: Parser[List[JSON]] =
+    def manyLeadingSeparatorWithJson: Parser[List[MyJSON]] =
       many(leadingSeparatorWithJson)
 
     def jArrayWithAtLeastOneElement: Parser[JArray] =
@@ -46,15 +46,15 @@ object JSON {
     def jArray: Parser[JArray] =
       jArrayWithAtLeastOneElement | jArrayWithNoElements
 
-    def keyValue: Parser[(String, JSON)] =
+    def keyValue: Parser[(String, MyJSON)] =
       stringLiteral *** ":" *** json map { case ((k, _), v) =>
         (k, v)
       }
 
-    def keyValueWithSeparator: Parser[(String,JSON)] =
+    def keyValueWithSeparator: Parser[(String,MyJSON)] =
       "," *** keyValue map { case (_, kv) => kv }
 
-    def keyValues: Parser[Map[String, JSON]] =
+    def keyValues: Parser[Map[String, MyJSON]] =
       many(keyValueWithSeparator) map { l => l.toMap}
 
     def jObjectWithAtLeastOneElement: Parser[JObject] =
@@ -68,7 +68,7 @@ object JSON {
     def jObject: Parser[JObject] =
       jObjectWithAtLeastOneElement | jObjectWithNoElements
 
-    def json: Parser[JSON] = jNumber | jString | jBoolean | jArray | jObject
+    def json: Parser[MyJSON] = jBoolean/* | jNumber | jString | jArray | jObject*/
 
     json
 

@@ -21,13 +21,21 @@ object MyParsersTypes {
       case Failure(e, false) if isCommitted => Failure(e, true)
       case _ => this
     }
+    def advanceSuccess(n: Int): Result[A] = this match {
+      case Success(a,m) => Success(a,n+m)
+      case _ => this
+    }
   }
   case class Success[+A](get: A, charsConsumed: Int) extends Result[A]
   case class Failure(get: ParseError, isCommitted: Boolean=true) extends Result[Nothing]
 }
 
 object MyParsers extends Parsers[Parser] {
-  override def run[A](p: Parser[A])(input: String): Either[ParseError, A] = ???
+  override def run[A](p: Parser[A])(input: String): Either[ParseError, A] =
+    p(Location(input)) match {
+      case Failure(parseError, _) => Left(parseError)
+      case Success(a, _) => Right(a)
+    }
 
   /** Recognize and return a single String */
   override implicit def string(s: String): Parser[String] =
@@ -69,12 +77,11 @@ object MyParsers extends Parsers[Parser] {
     }
 
   override def flatMap[A, B](p: Parser[A])(f: (A) => Parser[B]): Parser[B] =
-    location => {
-      p(location) match {
-        case Success(a, charsConsumed) => f(a)(location.advanceBy(charsConsumed)).addCommit(charsConsumed==0)
-        case e@Failure(_,_) => e
-      }
+    l => p(l) match {
+      case Success(a,n) => f(a)(l.advanceBy(n))
+        .addCommit(n == 0)
+        .advanceSuccess(n)
+      case f@Failure(_,_) => f
     }
-
 
 }

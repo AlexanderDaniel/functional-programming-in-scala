@@ -69,9 +69,7 @@ trait Parsers[Parser[+_]] { self =>
     }
   /** Apply the function fto the result of p, if successful */
   def map[A, B](pa: Parser[A])(f: A => B): Parser[B] =
-    pa flatMap { a =>
-      succeed(f(a))
-    }
+    flatMap(pa)(f andThen succeed)
 
   def map2[A, B, C](pa: Parser[A], pb: => Parser[B])(f: (A, B) => C): Parser[C] =
     pa flatMap { a =>
@@ -109,9 +107,9 @@ trait Parsers[Parser[+_]] { self =>
     }
 
   case class ParserOps[A](p: Parser[A]) {
-    def |[B >: A](p2: Parser[B]): Parser[B] = self.or(p, p2)
+    def |[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
 
-    def or[B >: A](p2: Parser[B]): Parser[B] = self.or(p, p2)
+    def or[B >: A](p2: => Parser[B]): Parser[B] = self.or(p, p2)
 
     def map[B](f: A => B): Parser[B] = self.map(p)(f)
 
@@ -126,7 +124,7 @@ trait Parsers[Parser[+_]] { self =>
     def **[B](p2: Parser[B]) = self.product(p, p2)
     def ***[B](pb: Parser[B]) = self.productIgnoringWhitespace(p, pb)
 
-    def flatMap[B](f: A=> Parser[B]) = self.flatMap(p)(f)
+    def flatMap[B](f: A => Parser[B]) = self.flatMap(p)(f)
   }
 
 }
