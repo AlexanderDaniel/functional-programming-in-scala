@@ -37,4 +37,14 @@ object Monoid {
     override def zero: Option[A] = None
   }
 
+  def leftToRightEndoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
+    override def op(a1: A => A, a2: A => A): (A) => A = a1 andThen a2
+    override def zero: A => A = identity
+  }
+
+  def rightToLeftEndoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
+    override def op(a1: A => A, a2: A => A): (A) => A = a1 compose a2
+    override def zero: A => A = identity
+  }
+
 }
