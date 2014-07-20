@@ -16,6 +16,23 @@ object Monoid {
   def foldMap[A,B](as: List[A], m: Monoid[B])(f: A => B): B =
     as.foldLeft(m.zero)((z,a) => m.op(z, f(a)))
 
+  def foldRight[A,B](as: List[A])(z: B)(f: (A, B) => B): B =
+    foldMap(as, endoMonoid[B])(f.curried)(z)
+
+  def foldLeft[A,B](as: List[A], z: B)(f: (B,A) => B): B = {
+    foldMap(as, dual(endoMonoid[B]))(a => b => f(b, a))(z)
+  }
+
+  def foldMapV[A,B](as: IndexedSeq[A], m: Monoid[B])(f: A => B): B = {
+    if (as.size<2)
+      foldMap(as.toList, m)(f)
+    else {
+      val (part1, part2) = as.splitAt(as.size/2)
+      m.op(foldMapV(part1, m)(f), foldMapV(part2, m)(f))
+    }
+  }
+  
+    
   val stringMonoid = new Monoid[String] {
     def op(a1: String, a2: String): String = a1 + a2
     val zero: String = ""
@@ -46,13 +63,16 @@ object Monoid {
     override def zero: Option[A] = None
   }
 
-  def leftToRightEndoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
-    override def op(a1: A => A, a2: A => A): (A) => A = a1 andThen a2
-    override def zero: A => A = identity
+  def dual[A](m: Monoid[A]): Monoid[A] = new Monoid[A] {
+    override def op(a1: A, a2: A): A = m.op(a2, a1)
+    override def zero: A = m.zero
   }
 
-  def rightToLeftEndoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
-    override def op(a1: A => A, a2: A => A): (A) => A = a1 compose a2
+  def firstOptionMonoid[A]: Monoid[Option[A]] = optionMonoid[A]
+  def lastOptionMonoid[A]: Monoid[Option[A]] = dual(firstOptionMonoid)
+
+  def endoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
+    override def op(a1: A => A, a2: A => A): (A) => A = a1 andThen a2
     override def zero: A => A = identity
   }
 

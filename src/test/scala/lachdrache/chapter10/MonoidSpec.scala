@@ -15,4 +15,22 @@ class MonoidSpec extends FunSpec {
       }
     }
   }
+
+  describe("foldMapV") {
+    it("should work like foldMap") {
+      assertResult("alex") {
+        foldMapV(Vector("a", "l", "e", "x"), stringMonoid)(identity)
+      }
+    }
+    it("should work like foldMap for empty seq") {
+      assertResult("") {
+        foldMapV(Vector(), stringMonoid)(identity)
+      }
+    }
+    it("should work like foldMap for one element") {
+      assertResult("ali") {
+        foldMapV(Vector("ali"), stringMonoid)(identity)
+      }
+    }
+  }
 }
