@@ -31,8 +31,22 @@ object Monoid {
       m.op(foldMapV(part1, m)(f), foldMapV(part2, m)(f))
     }
   }
-  
-    
+
+  def ordered(ints: IndexedSeq[Int]): Boolean = {
+    val monoid = new Monoid[Option[(Int, Int, Boolean)]] {
+      def op(o1: Option[(Int, Int, Boolean)], o2: Option[(Int, Int, Boolean)]) =
+        (o1, o2) match {
+          case (Some((x1, y1, p)), Some((x2, y2, q))) =>
+            Some((x1 min x2, y1 max y2, p && q && y1 <= x2))
+          case (x, None) => x
+          case (None, x) => x
+        }
+      val zero = None
+    }
+    val folded: Option[(Int, Int, Boolean)] = foldMapV(ints, monoid)(i => Some((i, i, true)))
+    folded map (_._3) getOrElse true
+  }
+
   val stringMonoid = new Monoid[String] {
     def op(a1: String, a2: String): String = a1 + a2
     val zero: String = ""
