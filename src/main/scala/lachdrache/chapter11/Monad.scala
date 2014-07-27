@@ -24,6 +24,10 @@ trait Monad[F[_]] extends Functor[F] {
   def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] =
     sequence(la map f)
 
+  // exercise 4
+  def replicateM[A](n: Int, ma: F[A]): F[List[A]] =
+    sequence(List.fill(n)(ma))
+
 }
 
 object Monad {
