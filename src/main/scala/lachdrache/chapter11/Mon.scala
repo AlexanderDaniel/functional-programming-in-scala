@@ -1,5 +1,7 @@
 package lachdrache.chapter11
 
+import scala.language.higherKinds
+
 trait Mon[F[_]] {
   def map[A,B](fa: F[A])(f: A => B): F[B]
   def flatMap[A,B](fa: F[A])(f: A => F[B]): F[B]

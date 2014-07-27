@@ -13,9 +13,4 @@ class FunctorSpec extends FunSpec {
     }
   }
 
-  describe("codistribute") {
-    it("should work for list functor") {
-      assertResult()
-    }
-  }
 }
