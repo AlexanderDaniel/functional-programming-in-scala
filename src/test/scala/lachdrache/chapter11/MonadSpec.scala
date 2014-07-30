@@ -116,5 +116,42 @@ class MonadSpec extends FunSpec {
 
   }
 
-  def substitutionModel(thunk: => Unit): Unit = {}
+  describe("product should convert a pair of monads to a monad of pairs") {
+    it("optionMonad with None at first position") {
+      assertResult(None) {
+        optionMonad.product(None, Some(3))
+      }
+    }
+    it("optionMonad with None at second position") {
+      assertResult(None) {
+        optionMonad.product(Some(1), None)
+      }
+    }
+    it("optionMonad with Some") {
+      assertResult(Some(1,3)) {
+        optionMonad.product(Some(1), Some(3))
+      }
+    }
+
+    it("listMonad with empty lists") {
+      assertResult(Nil) {
+        listMonad.product(Nil, Nil)
+      }
+    }
+    it("listMonad with two singleton lists") {
+      assertResult(List((1,2))) {
+        listMonad.product(List(1), List(2))
+      }
+    }
+    it("listMonad with one singleton list and one two-element list") {
+      assertResult(List((1,2), (1,3))) {
+        listMonad.product(List(1), List(2,3))
+      }
+    }
+    it("listMonad with two two-element lists") {
+      assertResult(List((1,3), (1,4), (2,3), (2,4))) {
+        listMonad.product(List(1,2), List(3,4))
+      }
+    }
+  }
 }
