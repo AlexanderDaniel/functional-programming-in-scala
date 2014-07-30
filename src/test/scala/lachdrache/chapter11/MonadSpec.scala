@@ -177,6 +177,5 @@ class MonadSpec extends FunSpec {
       }
     }
   }
-  
 
 }
