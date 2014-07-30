@@ -155,17 +155,28 @@ class MonadSpec extends FunSpec {
     }
   }
 
-  describe("filterM") {
-    it("should return numbers>2") {
-      assertResult(listMonad.unit(List(3,4,5))) {
-        listMonad.filterM(List(1,2,3,4,5))(a => listMonad.unit(a>2))
+  assertFilterM("filterM by lachdrache")(listMonad.filterMByLachdrache)
+  assertFilterM("filterM by authors")(listMonad.filterM)
+
+  def assertFilterM(msg: String)(filterM: (List[Int]) => ((Int) => List[Boolean]) => List[List[Int]]): Unit = {
+    describe(msg) {
+      it("should work with empty lists") {
+        assertResult(listMonad.unit(Nil)) {
+          filterM(Nil)(_ => listMonad.unit(true))
+        }
       }
-    }
-    it("should filter even numbers") {
-      assertResult(listMonad.unit(List(2,4,6,8))) {
-        listMonad.filterM((1 to 8).toList)(a => listMonad.unit(a%2==0))
+      it("should return numbers>2") {
+        assertResult(listMonad.unit(List(3,4,5))) {
+          filterM(List(1,2,3,4,5))(a => listMonad.unit(a>2))
+        }
+      }
+      it("should filter even numbers") {
+        assertResult(listMonad.unit(List(2,4,6,8))) {
+          filterM((1 to 8).toList)(a => listMonad.unit(a%2==0))
+        }
       }
     }
   }
+  
 
 }

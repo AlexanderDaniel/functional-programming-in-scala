@@ -32,15 +32,23 @@ trait Monad[F[_]] extends Functor[F] {
     map2(ma, mb)((_, _))
 
   // exercise 6
-  def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] = {
+  def filterMByLachdrache[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] = {
     val mlla: F[List[List[A]]] = sequence(ms map { a =>
       filterA(a)(f)
     })
     map(mlla)(_.flatten)
   }
-
   def filterA[A](a: A)(f: A => F[Boolean]): F[List[A]] =
     map(f(a))(b => if (b) List(a) else List.empty[A])
+  
+  // exercise 6 (author's solution)
+  def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] =
+    ms match {
+      case Nil => unit(Nil)
+      case h :: t => flatMap(f(h))(b =>
+        if (!b) filterM(t)(f)
+        else map(filterM(t)(f))(h :: _))
+    }
 }
 
 object Monad {
