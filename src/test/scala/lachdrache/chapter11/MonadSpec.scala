@@ -157,6 +157,15 @@ class MonadSpec extends FunSpec {
 
   assertFilterM("filterM by lachdrache")(listMonad.filterMByLachdrache)
   assertFilterM("filterM by authors")(listMonad.filterM)
+  
+  describe("compose") {
+    it("should run the first Kleisli arrow and than the second") {
+      assertResult(List(13)) {
+        val c: (Int) => List[Int] = listMonad.compose((a: Int) => listMonad.unit(a), (b: Int) => listMonad.unit(b+3))
+        c(10)
+      }
+    }
+  }
 
   def assertFilterM(msg: String)(filterM: (List[Int]) => ((Int) => List[Boolean]) => List[List[Int]]): Unit = {
     describe(msg) {
