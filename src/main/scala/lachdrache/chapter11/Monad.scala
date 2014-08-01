@@ -58,6 +58,10 @@ trait Monad[F[_]] extends Functor[F] {
   def flatMapInTermsOfCompose[A,B](ma: F[A])(f: A => F[B]): F[B] =
     compose((_: Unit) => ma, f)(())
 
+  // exercise 12
+  // https://github.com/fpinscala/fpinscala/issues/289
+  def join[A](mma: F[F[A]]): F[A] =
+    flatMap(mma)(identity)
 }
 
 object Monad {
