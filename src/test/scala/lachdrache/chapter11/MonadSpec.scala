@@ -167,6 +167,14 @@ class MonadSpec extends FunSpec {
     }
   }
 
+  describe("flatMap in terms of compose") {
+    it("should run the first Kleisli arrow and than the second") {
+      assertResult(List(13)) {
+        listMonad.flatMap(listMonad.unit(3))(a => listMonad.unit(3+10))
+      }
+    }
+  }
+
   def assertFilterM(msg: String)(filterM: (List[Int]) => ((Int) => List[Boolean]) => List[List[Int]]): Unit = {
     describe(msg) {
       it("should work with empty lists") {
