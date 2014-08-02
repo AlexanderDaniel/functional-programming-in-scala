@@ -175,6 +175,34 @@ class MonadSpec extends FunSpec {
     }
   }
 
+  describe("identity monad") {
+    it("unit") {
+      assertResult(Id(3)) {
+        idMonad.unit(3)
+      }
+    }
+    it("flatMap") {
+      assertResult(Id(5)) {
+        Id(3) flatMap (a => Id(a+2))
+      }
+    }
+    it("map") {
+      assertResult(Id(5)) {
+        Id(3) map (_+2)
+      }
+    }
+    it("using it with string") {
+      assertResult(Id("Hello, monad!")) {
+        Id("Hello, ") flatMap (a =>
+          Id("monad!") flatMap (b =>
+            Id(a + b)
+          )
+        )
+      }
+    }
+
+  }
+
   def assertFilterM(msg: String)(filterM: (List[Int]) => ((Int) => List[Boolean]) => List[List[Int]]): Unit = {
     describe(msg) {
       it("should work with empty lists") {
