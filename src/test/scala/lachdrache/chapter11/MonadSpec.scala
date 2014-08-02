@@ -200,6 +200,14 @@ class MonadSpec extends FunSpec {
         )
       }
     }
+    it("with for-comprehension") {
+      assertResult(Id("Hello, monad!")) {
+        for {
+          a <- Id("Hello, ")
+          b <- Id("monad!")
+        } yield a + b
+      }
+    }
 
   }
 

@@ -1,5 +1,6 @@
 package lachdrache.chapter11
 
+import lachdrache.chapter6.State
 import lachdrache.chapter7.Par
 import lachdrache.chapter7.Par.Par
 import lachdrache.chapter8.Gen
@@ -109,6 +110,27 @@ object Monad {
   val idMonad = new Monad[Id] {
     def unit[A](a: => A): Id[A] = Id(a)
     def flatMap[A, B](ma: Id[A])(f: (A) => Id[B]): Id[B] =
+      ma flatMap f
+  }
+
+  type IntState[A] = State[Int, A]
+  object IntStateMonad extends Monad[IntState] {
+    def unit[A](a: => A): IntState[A] = State(s => (a, s))
+
+    def flatMap[A, B](ma: IntState[A])(f: (A) => IntState[B]): IntState[B] =
+      ma flatMap f
+  }
+  object IntStateMonadWithAnonymousType extends Monad[({type IntState[A] = State[Int, A]})#IntState] {
+    def unit[A](a: => A): State[Int, A] = State(s => (a, s))
+
+    def flatMap[A, B](ma: State[Int, A])(f: (A) => State[Int, B]): State[Int, B] =
+      ma flatMap f
+  }
+
+  def stateMonad[S] = new Monad[({type f[x] = State[S,x]})#f] {
+    def unit[A](a: => A): State[S, A] = State(s => (a, s))
+
+    def flatMap[A, B](ma: State[S, A])(f: (A) => State[S, B]): State[S, B] =
       ma flatMap f
   }
 }
