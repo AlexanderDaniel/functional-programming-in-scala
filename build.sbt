@@ -2,10 +2,10 @@ name := "functional-programming-in-scala"
 
 version := "1.0"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2" % "2.3.7" % "test",
+  "org.specs2" %% "specs2" % "2.4.1" % "test",
   "org.scalatest" %% "scalatest" % "2.1.5" % "test"
 )
 
