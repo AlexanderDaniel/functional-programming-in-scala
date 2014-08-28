@@ -1,5 +1,6 @@
 package lachdrache.chapter11
 
+import lachdrache.chapter12.Applicative
 import lachdrache.chapter6.State
 import lachdrache.chapter7.Par
 import lachdrache.chapter7.Par.Par
@@ -7,29 +8,29 @@ import lachdrache.chapter8.Gen
 
 import scala.language.higherKinds
 
-trait Monad[F[_]] extends Functor[F] {
+trait Monad[F[_]] extends Applicative[F] {
   def unit[A](a: => A):F[A]
   def flatMap[A,B](ma: F[A])(f: A => F[B]): F[B]
 
-  def map[A,B](ma: F[A])(f: A => B): F[B] =
+  override def map[A,B](ma: F[A])(f: A => B): F[B] =
     flatMap(ma)(a => unit(f(a)))
 
   def map2[A,B,C](ma: F[A], mb: F[B])(f: (A,B) => C): F[C] =
     flatMap(ma)(a => map(mb)(b => f(a,b)))
 
   // exercise 3
-  def sequence[A](lma: List[F[A]]): F[List[A]] =
+  override def sequence[A](lma: List[F[A]]): F[List[A]] =
     lma.foldRight(unit(List.empty[A]))((ma, mla) =>
       map2(ma, mla)(_ :: _)
     )
-  def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] =
+  override def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] =
     sequence(la map f)
 
   // exercise 4
-  def replicateM[A](n: Int, ma: F[A]): F[List[A]] =
+  override def replicateM[A](n: Int, ma: F[A]): F[List[A]] =
     sequence(List.fill(n)(ma))
 
-  def product[A,B](ma: F[A], mb: F[B]): F[(A,B)] =
+  override def product[A,B](ma: F[A], mb: F[B]): F[(A,B)] =
     map2(ma, mb)((_, _))
 
   // exercise 6
