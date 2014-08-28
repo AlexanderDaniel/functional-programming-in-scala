@@ -51,6 +51,12 @@ trait Monad[F[_]] extends Functor[F] {
         else map(filterM(t)(f))(h :: _))
     }
 
+  // exercise 6 by Yago
+  def filterMByYago[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] =
+    ms.foldRight(unit(List[A]())) { (a, fla) =>
+      map2(f(a), fla)((b, la) => if (b) a :: la else la)
+    }
+
   // exercise 7
   def compose[A,B,C](f: A => F[B], g: B => F[C]): A => F[C] =
     a => flatMap(f(a))(g)

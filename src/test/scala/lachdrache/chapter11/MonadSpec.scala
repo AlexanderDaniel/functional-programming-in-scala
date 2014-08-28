@@ -157,7 +157,8 @@ class MonadSpec extends FunSpec {
 
   assertFilterM("filterM by lachdrache")(listMonad.filterMByLachdrache)
   assertFilterM("filterM by authors")(listMonad.filterM)
-  
+  assertFilterM("filterM by Yago")(listMonad.filterMByYago)
+
   describe("compose") {
     it("should run the first Kleisli arrow and than the second") {
       assertResult(List(13)) {
