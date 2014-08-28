@@ -1,5 +1,7 @@
 package lachdrache.chapter11
 
+import scala.language.higherKinds
+
 trait Monad2[F[_]] {
   // primitives
   def unit[A](a: => A):F[A]
