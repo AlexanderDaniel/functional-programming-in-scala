@@ -140,4 +140,16 @@ object Monad {
     def flatMap[A, B](ma: State[S, A])(f: (A) => State[S, B]): State[S, B] =
       ma flatMap f
   }
+
+  // c12/5
+  def eitherMonad[E]: Monad[({type f[x] = Either[E,x]})#f] = new Monad[({type f[x] = Either[E, x]})#f] {
+    def flatMap[A, B](ma: Either[E, A])(f: (A) => Either[E, B]): Either[E, B] =
+      ma.fold(
+        lv => Left(lv),
+        rv => f(rv)
+      )
+
+    def unit[A](a: => A): Either[E, A] = Right(a)
+  }
+
 }
