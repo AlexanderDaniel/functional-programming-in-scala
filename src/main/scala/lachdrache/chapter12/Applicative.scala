@@ -48,5 +48,24 @@ trait Applicative[F[_]] extends Functor[F] {
   def map4[A,B,C,D,E](fa: F[A], fb: F[B], fc: F[C], fd: F[D])(f: (A, B, C, D) => E):F[E] =
     apply(apply(apply(apply(unit(f.curried))(fa))(fb))(fc))(fd)
 
+}
 
+object Applicative {
+
+  val optionApplicative: Applicative[Option] = new Applicative[Option] {
+    def map2[A, B, C](fa: Option[A], fb: Option[B])(f: (A, B) => C): Option[C] =
+      for (a <- fa; b <- fb) yield f(a,b)
+
+    def unit[A](a: => A): Option[A] =
+      Some(a)
+  }
+
+  val streamApplicative: Applicative[Stream] = new Applicative[Stream] {
+    def unit[A](a: => A): Stream[A] =
+      Stream.continually(a)
+
+    def map2[A, B, C](fa: Stream[A], fb: Stream[B])(f: (A, B) => C): Stream[C] =
+      fa zip fb map f.tupled
+
+  }
 }
