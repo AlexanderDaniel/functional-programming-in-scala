@@ -85,4 +85,18 @@ object Applicative {
       fa zip fb map f.tupled
 
   }
+
+  // exercise c12/6
+  def validationApplicative[E]: Applicative[({type f[x] = Validation[E, x]})#f] = new Applicative[({type f[x] = Validation[E, x]})#f] {
+    def unit[A](a: => A): Validation[E, A] =
+      Success(a)
+
+    def map2[A, B, C](fa: Validation[E, A], fb: Validation[E, B])(f: (A, B) => C): Validation[E, C] =
+      (fa, fb) match {
+        case (Failure(e1h, e1t), Failure(e2h, e2t)) => Failure(e1h, e1t ++ Vector(e2h) ++ e2t)
+        case (Success(a), Success(b)) => Success(f(a,b))
+        case (f@Failure(_, _), Success(_)) => f
+        case (Success(_), f@Failure(_, _)) => f
+      }
+  }
 }
