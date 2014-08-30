@@ -141,7 +141,7 @@ object Monad {
       ma flatMap f
   }
 
-  // c12/5
+  // exercise c12/5
   def eitherMonad[E]: Monad[({type f[x] = Either[E,x]})#f] = new Monad[({type f[x] = Either[E, x]})#f] {
     def flatMap[A, B](ma: Either[E, A])(f: (A) => Either[E, B]): Either[E, B] =
       ma.fold(
