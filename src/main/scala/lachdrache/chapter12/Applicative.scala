@@ -1,6 +1,7 @@
 package lachdrache.chapter12
 
 import lachdrache.chapter11.Functor
+import lachdrache.chapter12.Applicative._
 import scala.language.higherKinds
 
 trait Applicative[F[_]] extends Functor[F] {
@@ -48,6 +49,22 @@ trait Applicative[F[_]] extends Functor[F] {
   def map4[A,B,C,D,E](fa: F[A], fb: F[B], fc: F[C], fd: F[D])(f: (A, B, C, D) => E):F[E] =
     apply(apply(apply(apply(unit(f.curried))(fa))(fb))(fc))(fd)
 
+  // exercise 4: What is the meaning of streamApplicative.sequence
+  object Exercise4 {
+    // It turns a list of streams to a stream of lists.
+    // The head of the result stream contains a List where the elements
+    // are the heads of the input streams, e.g.
+    val input = List(Stream(1, 2, 3), Stream(4, 5, 6))
+    val result = streamApplicative.sequence(input)
+    assert(result.take(3).toList == List(List(1, 4), List(2, 5), List(3, 6)))
+    // More generally speaking is zips all of the input streams and converts
+    // the nested tuples into a list.
+    //
+    // The authors have a very different way of explaining it:
+    // This transposes the list! That is, we start with a list of rows,
+    // each of which is possibly infinite in length. We get back a single row,
+    // where each element is the column of values at that position.
+  }
 }
 
 object Applicative {
