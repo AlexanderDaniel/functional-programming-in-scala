@@ -28,7 +28,7 @@ trait Applicative[F[_]] extends Functor[F] {
 
   // exercise c12/2 part 1: define in terms of map2 and unit
   def apply[A,B](fab: F[A => B])(fa: F[A]): F[B] =
-    map2(fa, fab) { (a, a2b) =>
+    map2(fab, fa) { (a2b, a) =>
       a2b(a)
     }
 
@@ -91,7 +91,7 @@ object Applicative {
     def unit[A](a: => A): Validation[E, A] =
       Success(a)
 
-    def map2[A, B, C](fa: Validation[E, A], fb: Validation[E, B])(f: (A, B) => C): Validation[E, C] =
+    override def map2[A, B, C](fa: Validation[E, A], fb: Validation[E, B])(f: (A, B) => C): Validation[E, C] =
       (fa, fb) match {
         case (Failure(e1h, e1t), Failure(e2h, e2t)) => Failure(e1h, e1t ++ Vector(e2h) ++ e2t)
         case (Success(a), Success(b)) => Success(f(a,b))
