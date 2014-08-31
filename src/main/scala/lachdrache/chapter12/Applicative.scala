@@ -65,6 +65,11 @@ trait Applicative[F[_]] extends Functor[F] {
     // each of which is possibly infinite in length. We get back a single row,
     // where each element is the column of values at that position.
   }
+
+  def assoc[A,B,C](p: (A, (B, C))): ((A,B), C) =
+    p match {
+      case (a, (b, c)) => ((a, b), c)
+    }
 }
 
 object Applicative {
