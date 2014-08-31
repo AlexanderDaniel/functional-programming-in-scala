@@ -104,6 +104,10 @@ trait Applicative[F[_]] extends Functor[F] {
         }
     }
   }
+
+  // exercise c12/10 TODO
+  // exercise c12/11 TODO
+
 }
 
 object Applicative {
