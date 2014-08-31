@@ -70,6 +70,28 @@ trait Applicative[F[_]] extends Functor[F] {
     p match {
       case (a, (b, c)) => ((a, b), c)
     }
+
+  def productF[I,O,I2,O2](f: I => O, g: I2 => O2): (I, I2) => (O, O2) =
+    (i, i2) => (f(i), g(i2))
+
+  // exercise c12/7 TODO
+
+  // exercise c12/8
+  def product[G[_]](G: Applicative[G]): Applicative[({type f[x] = (F[x], G[x])})#f] = {
+    val self = this
+
+    new Applicative[({type f[x] = (F[x], G[x])})#f] {
+
+      def unit[A](a: => A): (F[A], G[A]) =
+        (self.unit(a), G.unit(a))
+
+      def map2[A, B, C](fa: (F[A], G[A]), fb: (F[B], G[B]))(f: (A, B) => C): (F[C], G[C]) =
+        (fa, fb) match {
+          case ((a0, a1), (b0, b1)) => (self.map2(a0,b0)(f), G.map2(a1,b1)(f))
+        }
+
+    }
+  }
 }
 
 object Applicative {
