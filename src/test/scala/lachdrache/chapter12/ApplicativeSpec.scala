@@ -95,4 +95,17 @@ class ApplicativeSpec extends FunSpec {
       }
     }
   }
+
+  describe("sequenceMap") {
+    it("converts a map of applicative values to an applicative of map") {
+      val input = Map(
+        1 -> validationApplicative.unit("one"),
+        2 -> validationApplicative.unit("two"),
+        3 -> validationApplicative.unit("three")
+      )
+      assertResult(validationApplicative.unit(Map(1 -> "one", 2 -> "two", 3 -> "three"))) {
+        validationApplicative.sequenceMap(input)
+      }
+    }
+  }
 }

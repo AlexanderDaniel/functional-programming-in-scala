@@ -108,6 +108,12 @@ trait Applicative[F[_]] extends Functor[F] {
   // exercise c12/10 TODO
   // exercise c12/11 TODO
 
+  // exercise c12/12
+  def sequenceMap[K, V](ofa: Map[K, F[V]]): F[Map[K, V]] =
+    ofa.foldRight(unit(Map.empty[K, V])) { case ((k, fv), fz) =>
+      map2(fz, fv)((z, v) => z.updated(k, v))
+    }
+
 }
 
 object Applicative {
@@ -142,4 +148,5 @@ object Applicative {
         case (Success(_), f@Failure(_, _)) => f
       }
   }
+
 }
