@@ -81,7 +81,6 @@ trait Applicative[F[_]] extends Functor[F] {
     val self = this
 
     new Applicative[({type f[x] = (F[x], G[x])})#f] {
-
       def unit[A](a: => A): (F[A], G[A]) =
         (self.unit(a), G.unit(a))
 
@@ -89,9 +88,10 @@ trait Applicative[F[_]] extends Functor[F] {
         (fa, fb) match {
           case ((a0, a1), (b0, b1)) => (self.map2(a0,b0)(f), G.map2(a1,b1)(f))
         }
-
     }
   }
+
+
 }
 
 object Applicative {
