@@ -6,11 +6,11 @@ import scala.language.higherKinds
 
 trait Applicative[F[_]] extends Functor[F] {
   // primitive combinators
-  def map2[A,B,C](fa :F[A], fb: F[B])(f: (A, B) => C): F[C]
   def unit[A](a: => A): F[A]
+  def map2[A,B,C](fa :F[A], fb: F[B])(f: (A, B) => C): F[C]
 
   // derived combinators
-  def map[A,B](fa: F[A])(f: A => B): F[B] =
+  override def map[A,B](fa: F[A])(f: A => B): F[B] =
     map2(fa, unit(()))((a, _) => f(a))
 
   def traverse[A,B](as: List[A])(f: A => F[B]): F[List[B]] =
@@ -91,7 +91,19 @@ trait Applicative[F[_]] extends Functor[F] {
     }
   }
 
+  // exercise c12/9
+  def compose[G[_]](G: Applicative[G]): Applicative[({type f[x] = F[G[x]]})#f] = {
+    val self = this
+    new Applicative[({type f[x] = F[G[x]]})#f] {
+      override def unit[A](a: => A): F[G[A]] =
+        self.unit(G.unit(a))
 
+      override def map2[A, B, C](fga: F[G[A]], fgb: F[G[B]])(f: (A, B) => C): F[G[C]] =
+        self.map2(fga, fgb) { (ga, gb) =>
+          G.map2(ga, gb)(f)
+        }
+    }
+  }
 }
 
 object Applicative {
