@@ -1,13 +1,27 @@
 package lachdrache.chapter12
 
+import lachdrache.chapter11.{Monad, Functor}
+import lachdrache.chapter11.Monad.Id
+
 import scala.language.higherKinds
 
-trait Traverse[F[_]]  {
+trait Traverse[F[_]] extends Functor[F] {
 
-  def traverse[G[_]:Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]]
+  def traverse[G[_], A, B](fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[F[B]] = sequence(map(fa)(f))
 
   def sequence[G[_]:Applicative, A](fga: F[G[A]]): G[F[A]] =
     traverse(fga)(ga => ga)
+
+  type Id[A] = A
+
+  val idMonad = new Monad[Id] {
+    def unit[A](a: => A) = a
+    override def flatMap[A,B](a: A)(f: A => B): B = f(a)
+  }
+
+  // exercise c12/14
+  def map[A,B](fa: F[A])(f: A => B): F[B] =
+    traverse[Id, A, B](fa)(f)(idMonad)
 }
 
 object Traverse {
