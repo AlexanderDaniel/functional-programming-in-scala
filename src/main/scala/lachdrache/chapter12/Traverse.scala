@@ -1,15 +1,14 @@
 package lachdrache.chapter12
 
 import lachdrache.chapter11.{Monad, Functor}
-import lachdrache.chapter11.Monad.Id
 
 import scala.language.higherKinds
 
 trait Traverse[F[_]] extends Functor[F] {
 
-  def traverse[G[_], A, B](fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[F[B]] = sequence(map(fa)(f))
+  def traverse[G[_], A, B](fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[F[B]]
 
-  def sequence[G[_]:Applicative, A](fga: F[G[A]]): G[F[A]] =
+  def sequence[G[_], A](fga: F[G[A]])(implicit G: Applicative[G]): G[F[A]] =
     traverse(fga)(ga => ga)
 
   type Id[A] = A
@@ -43,7 +42,7 @@ object Traverse {
       }
   }
 
-  case class Tree[+A](head: A, tail: List[Tree[A]])
+  case class Tree[+A](head: A, tail: List[Tree[A]] = List())
 
   // exercise ch12/13 part 2
   val treeTraverse = new Traverse[Tree] {
