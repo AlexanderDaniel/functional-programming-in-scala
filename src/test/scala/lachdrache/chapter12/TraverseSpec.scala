@@ -1,14 +1,41 @@
 package lachdrache.chapter12
 
+import lachdrache.chapter11.Monad
 import lachdrache.chapter12.Traverse.Tree
 import org.scalatest.FunSpec
 
 class TraverseSpec extends FunSpec {
 
-  describe("List[Option[A]] => Option[List[A]]") {
+  describe("List[Option[A]] => Option[List[A]] with Applicative") {
     it("this is the standard applicative sequence") {
       assertResult(Some(List(1, 2, 3))) {
         Applicative.optionApplicative.sequence(List(Some(1), Some(2), Some(3)))
+      }
+    }
+  }
+
+  describe("List[Option[A]] => Option[List[A]] with Traverse") {
+    implicit val optionApplicative = Applicative.optionApplicative
+
+    it("The types: Traverse is List, Applicative is Option") {
+      assertResult(Some(List(1, 2, 3))) {
+        Traverse.listTraverse.sequence(List[Option[Int]](Some(1), Some(2), Some(3))) // type hint is needed
+      }
+    }
+  }
+
+  describe("Option[List[A]] => List[Option[A]] • The types: Traverse is Option, Applicative is List") {
+    implicit val applicative = Monad.listMonad
+
+    it("Some") {
+      assertResult(List(Some(1), Some(2), Some(3))) {
+        Traverse.optionTraverse.sequence(Some(List(1, 2, 3)))
+      }
+    }
+
+    it("None") {
+      assertResult(List(None)) {
+        Traverse.optionTraverse.sequence(None)
       }
     }
   }
@@ -56,4 +83,5 @@ class TraverseSpec extends FunSpec {
       }
     }
   }
+
 }
