@@ -1,10 +1,11 @@
 package lachdrache.chapter12
 
+import lachdrache.chapter10.{Monoid, Foldable}
 import lachdrache.chapter11.{Monad, Functor}
 
-import scala.language.higherKinds
+import scala.language.{ higherKinds, implicitConversions }
 
-trait Traverse[F[_]] extends Functor[F] {
+trait Traverse[F[_]] extends Functor[F] with Foldable[F] {
 
   def traverse[G[_], A, B](fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[F[B]]
 
@@ -21,6 +22,17 @@ trait Traverse[F[_]] extends Functor[F] {
   // exercise c12/14
   def map[A,B](fa: F[A])(f: A => B): F[B] =
     traverse[Id, A, B](fa)(f)(idMonad)
+
+  type Const[M, B] = M
+
+  implicit def monoidApplicative[M](M : Monoid[M]) =
+    new Applicative[({type f[x] = Const[M, x]})#f] {
+        override def unit[A](a: => A): M = M.zero
+        override def map2[A,B,C](m1: M, m2: M)(f: (A,B) => C): M = M.op(m1, m2)
+    }
+
+  override def foldMap[A,M](as: F[A])(f: A => M)(mb: Monoid[M]): M =
+    traverse[({type f[x] = Const[M, x]})#f, A, Nothing](as)(f)(monoidApplicative((mb)))
 }
 
 object Traverse {
