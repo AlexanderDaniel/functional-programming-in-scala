@@ -2,6 +2,7 @@ package lachdrache.chapter12
 
 import lachdrache.chapter10.{Monoid, Foldable}
 import lachdrache.chapter11.{Monad, Functor}
+import lachdrache.chapter6.State
 
 import scala.language.{ higherKinds, implicitConversions }
 
@@ -32,7 +33,16 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] {
     }
 
   override def foldMap[A,M](as: F[A])(f: A => M)(mb: Monoid[M]): M =
-    traverse[({type f[x] = Const[M, x]})#f, A, Nothing](as)(f)(monoidApplicative((mb)))
+    traverse[({type f[x] = Const[M, x]})#f, A, Nothing](as)(f)(monoidApplicative(mb))
+
+  def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S, F[B]] =
+    traverse[({type f[x] = State[S,x]})#f,A,B](fa)(f)(Monad.stateMonad)
+
+  def zipWithIndex[A](ta: F[A]): F[(A,Int)] =
+    traverseS(ta)((a:A) => for {
+      i <- State.get[Int]
+      _ <- State.set(i + 1)
+    } yield (a, i)).run(0)._1
 }
 
 object Traverse {
