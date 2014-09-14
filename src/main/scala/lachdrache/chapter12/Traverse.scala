@@ -44,7 +44,7 @@ object Traverse {
 
   case class Tree[+A](head: A, tail: List[Tree[A]] = List())
 
-  // exercise ch12/13 part 2
+  // exercise ch12/13 part 3
   val treeTraverse = new Traverse[Tree] {
     override def traverse[G[_],A,B](ta: Tree[A])(f: A => G[B])(implicit G: Applicative[G]): G[Tree[B]] =
       G.map2(f(ta.head), listTraverse.traverse(ta.tail)(a => traverse(a)(f)))(Tree(_, _))
