@@ -43,6 +43,29 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] {
       i <- State.get[Int]
       _ <- State.set(i + 1)
     } yield (a, i)).run(0)._1
+
+  override def toList[A](fa: F[A]): List[A] =
+    traverseS(fa)((a: A) => for {
+      as <- State.get[List[A]]
+      _ <- State.set(a :: as)
+    } yield ()).run(Nil)._2.reverse
+
+  def mapAccu[S,A,B](fa: F[A], s: S)(f: (A, S) => (B, S)): (F[B], S) =
+    traverseS(fa)((a: A) => for {
+      s1 <- State.get[S]
+      (b, s2) = f(a, s1)
+      _ <- State.set(s2)
+    } yield b).run(s)
+
+  def toListViaMapAccu[A](fa: F[A]): List[A] =
+    mapAccu(fa, List.empty[A])((a, s) => ((), a :: s))._2.reverse
+
+  def zipWithIndexViaMapAccu[A](fa: F[A]): F[(A,Int)] =
+    mapAccu(fa, 0)((a,s) => ((a,s), s+1))._1
+
+  // exercise 12.16
+  def reverse[A](fa: F[A]): F[A] =
+    mapAccu(fa, toList(fa).reverse)((_, as) => (as.head, as.tail))._1
 }
 
 object Traverse {
