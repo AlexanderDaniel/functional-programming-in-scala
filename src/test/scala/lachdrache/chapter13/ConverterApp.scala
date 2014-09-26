@@ -2,7 +2,7 @@ package lachdrache.chapter13
 
 import IO._
 
-object Converter extends App {
+object ConverterApp extends App {
 
   def fahrenheitToCelsius(f: Double) =
     (f - 32) * 5.0/9.0

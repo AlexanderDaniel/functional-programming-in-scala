@@ -21,4 +21,8 @@ object IO extends Monad[IO] {
 
   def ReadLine: IO[String] = IO { StdIn.readLine() }
   def PrintLine(msg: String): IO[Unit] = IO { println(msg) }
+
+  val echo: IO[Unit] = ReadLine.flatMap(PrintLine)
+  val readInt: IO[Int] = ReadLine.map(_.toInt)
+  val readInts: IO[(Int, Int)] = IO.product(readInt, readInt)
 }
