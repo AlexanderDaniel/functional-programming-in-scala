@@ -2,6 +2,7 @@ package lachdrache.chapter5
 
 import scala.collection.mutable.ListBuffer
 import Stream._
+import scala.language.postfixOps
 
 sealed trait Stream[+A] {
   def toList: List[A] = this match {
