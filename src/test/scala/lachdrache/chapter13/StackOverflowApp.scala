@@ -1,6 +1,7 @@
 package lachdrache.chapter13
 
-import IO._
+import IO1.IO
+import IO1.IO._
 
 object StackOverflowApp extends App {
 
