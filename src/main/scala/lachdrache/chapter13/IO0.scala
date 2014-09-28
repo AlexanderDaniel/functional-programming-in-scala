@@ -1,6 +1,6 @@
 package lachdrache.chapter13
 
-object SimpleIOType {
+object IO0 {
 
   trait IO {
     def run(): Unit
