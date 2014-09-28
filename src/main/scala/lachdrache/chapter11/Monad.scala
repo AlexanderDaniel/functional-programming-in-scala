@@ -107,6 +107,11 @@ trait Monad[F[_]] extends Applicative[F] {
     _ <- if (ok) doWhile(a)(cond) else unit(())
   } yield ()
 
+  def forever[A](fa: F[A]): F[Unit] = for {
+    a <- fa
+    _ <- forever(fa)
+  } yield ()
+
   def when[A](b: Boolean)(fa: => F[A]): F[Boolean] =
     if (b) as(fa)(true) else unit(false)
 
