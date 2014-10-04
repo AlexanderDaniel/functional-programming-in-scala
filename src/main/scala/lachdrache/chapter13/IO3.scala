@@ -34,4 +34,16 @@ object IO3 {
         ma flatMap f
     }
 
+  // Exercise 13.2
+  @annotation.tailrec
+  def runTrampoline[A](a: Free[Function0,A]): A = a match {
+    case Return(a) => a
+    case Suspend(s) => s()
+    case FlatMap(s, f) => s match {
+      case Return(a) => runTrampoline(f(a))
+      case Suspend(s) => runTrampoline(f(s()))
+      case FlatMap(t, g) => runTrampoline(t flatMap (a => g(a) flatMap f))
+    }
+  }
+
 }
