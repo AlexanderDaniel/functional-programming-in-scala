@@ -46,4 +46,19 @@ object IO3 {
     }
   }
 
+  // Exercise 13.3
+  /** return either a `Suspend`, a `Return`, or a right-associated `FlatMap` */
+  def run[F[_],A](a: Free[F,A])(implicit F: Monad[F]): F[A] = step(a) match {
+    case Return(a) => F.unit(a)
+    case Suspend(s) => s
+    case FlatMap(Suspend(r), f) => F.flatMap(r)(a => run(f(a)))
+    case _ => sys.error("Impossible, since `step` eliminates these cases")
+  }
+  @annotation.tailrec
+  def step[F[_], A](a: Free[F,A]): Free[F,A] = a match {
+    case FlatMap(FlatMap(x, f), g) => step(x flatMap (a => f(a) flatMap g))
+    case FlatMap(Return(x), f) => step(f(x))
+    case _ => a
+  }
+
 }
