@@ -35,10 +35,14 @@ object AvoidingStackOverflowWithIO2a extends App {
 
   val f: Int => IO[Int] = (x: Int) => Return(x)
 
-  // does not compile TODO
-  //  val g = List.fill(100000)(f).foldLeft(f) {
-  //    (a: Int => IO[Int], b: Int => IO[Int]) => (x: Int) => Suspend(() => a(x).flatMap(b))
-  //  }
+  // https://github.com/fpinscala/fpinscala/issues/320
+  // https://github.com/fpinscala/fpinscala/issues/308
+  val g = List.fill(100000)(f).foldLeft(f) {
+    (a, b) => x => Suspend(() => ()).flatMap { _ => a(x).flatMap(b)}
+  }
+
+  println(IO.run(g(42)))
+
 
 }
 
