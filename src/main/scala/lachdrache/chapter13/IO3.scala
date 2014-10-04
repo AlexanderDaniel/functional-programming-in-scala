@@ -3,7 +3,6 @@ package lachdrache.chapter13
 import lachdrache.chapter11.Monad
 import lachdrache.chapter7.Par
 import lachdrache.chapter7.Par.Par
-import lachdrache.chapter7.Par.Par
 
 import scala.io.StdIn
 import scala.language.higherKinds
@@ -95,4 +94,45 @@ object IO3 {
     _ <- Console.printLn("I can only interact with the console.")
     ln <- Console.readLn
   } yield ln
+
+  /** Translate between any `F[A` to `G[A]` */
+  trait Translate[F[_], G[_]] {
+    def apply[A](f: F[A]): G[A]
+  }
+
+  /** gives us infix syntax `F ~> G` for `Translate[F,G]` */
+  type ~>[F[_], G[_]] = Translate[F,G]
+
+  val consoleToFunction0 = new (Console ~> Function0) {
+    override def apply[A](a: Console[A]): () => A = a.toThunk
+  }
+  val consoleToPar = new (Console ~> Par) {
+    override def apply[A](a: Console[A]): Par[A] = a.toPar
+  }
+
+  def runFree[F[_],G[_],A](free: Free[F,A])(t: F ~> G)(implicit G: Monad[G]): G[A] =
+    step(free) match {
+      case Return(a) => G.unit(a)
+      case Suspend(r) => t(r)
+      case FlatMap(Suspend(r), f) => G.flatMap(t(r))(a => runFree(f(a))(t))
+      case _ => sys.error("Impossible because `step` eliminates these cases")
+    }
+
+  def runConsoleFunction0[A](a: Free[Console,A]): () => A =
+    runFree[Console,Function0,A](a)(consoleToFunction0)
+  def runConsolePar[A](a: Free[Console,A]): Par[A] =
+    runFree[Console,Par,A](a)(consoleToPar)
+
+  implicit val function0Monad = new Monad[Function0] {
+    def unit[A](a: => A) = () => a
+    def flatMap[A,B](a: Function0[A])(f: A => Function0[B]) =
+      () => f(a())()
+  }
+  implicit val parMonad = new Monad[Par] {
+    override def unit[A](a: => A): Par[A] = Par.unit(a)
+    override def flatMap[A, B](a: Par[A])(f: (A) => Par[B]): Par[B] = Par.fork {
+      Par.flatMap(a)(f)
+    }
+  }
+
 }
