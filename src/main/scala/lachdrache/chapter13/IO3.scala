@@ -1,8 +1,11 @@
 package lachdrache.chapter13
 
 import lachdrache.chapter11.Monad
+import lachdrache.chapter7.Par
+import lachdrache.chapter7.Par.Par
 import lachdrache.chapter7.Par.Par
 
+import scala.io.StdIn
 import scala.language.higherKinds
 
 /**
@@ -61,4 +64,35 @@ object IO3 {
     case _ => a
   }
 
+  sealed trait Console[A] {
+    def toPar: Par[A]
+    def toThunk: () => A
+  }
+  case object ReadLine extends Console[Option[String]] {
+    override def toPar: Par[Option[String]] = Par.lazyUnit(run)
+    override def toThunk: () => Option[String] = () => run
+
+    def run: Option[String] =
+      try Some(StdIn.readLine())
+      catch { case e: Exception => None}
+  }
+  case class PrintLine(line: String) extends Console[Unit] {
+    override def toPar: Par[Unit] = Par.lazyUnit(println(line))
+    override def toThunk: () => Unit = () => println(line)
+  }
+
+  object Console {
+    type ConsoleIO[A] = Free[Console, A]
+
+    def readLn: ConsoleIO[Option[String]] =
+      Suspend(ReadLine)
+
+    def printLn(line: String): ConsoleIO[Unit] =
+      Suspend(PrintLine(line))
+  }
+
+  val f1: Free[Console, Option[String]] = for {
+    _ <- Console.printLn("I can only interact with the console.")
+    ln <- Console.readLn
+  } yield ln
 }
