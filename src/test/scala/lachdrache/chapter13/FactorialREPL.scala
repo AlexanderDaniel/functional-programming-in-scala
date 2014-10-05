@@ -20,7 +20,7 @@ object FactorialREPL extends App {
   } yield result
 
   val factorialREPL: IO[Unit] = sequence_(
-    IO { println(helpString) },
+    PrintLine(helpString),
     doWhile(ReadLine) { line =>
       when (line != "q") { for {
         n <- factorial(line.toInt)

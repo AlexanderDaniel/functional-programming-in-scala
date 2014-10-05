@@ -17,7 +17,7 @@ object IO3 {
     def flatMap[B](f: A => Free[F, B]): Free[F, B] =
       FlatMap(this, f)
     def map[B](f: A => B): Free[F, B] =
-      this flatMap (a => Return(f(a)))
+      this flatMap (a => Return(f(a))) // same as `f andThen (Return(_))`
   }
   case class Return[F[_], A](a: A) extends Free[F, A]
   case class Suspend[F[_], A](s: F[A]) extends Free[F, A]
@@ -66,10 +66,19 @@ object IO3 {
   sealed trait Console[A] {
     def toPar: Par[A]
     def toThunk: () => A
+    def toReader: ConsoleReader[A]
+    def toState: ConsoleState[A]
   }
   case object ReadLine extends Console[Option[String]] {
     override def toPar: Par[Option[String]] = Par.lazyUnit(run)
     override def toThunk: () => Option[String] = () => run
+    override def toReader = ConsoleReader { in => Some(in) }
+    override def toState = ConsoleState { bufs =>
+      bufs.in match {
+        case List() => (None, bufs)
+        case h :: t => (Some(h), bufs.copy(in = t))
+      }
+    }
 
     def run: Option[String] =
       try Some(StdIn.readLine())
@@ -78,6 +87,9 @@ object IO3 {
   case class PrintLine(line: String) extends Console[Unit] {
     override def toPar: Par[Unit] = Par.lazyUnit(println(line))
     override def toThunk: () => Unit = () => println(line)
+    override def toReader = ConsoleReader { s => () } // noop
+    override def toState = ConsoleState { bufs => ((), bufs.copy(out = bufs.out :+ line)) } // append to the output
+
   }
 
   object Console {
@@ -134,5 +146,67 @@ object IO3 {
       Par.flatMap(a)(f)
     }
   }
+
+  // Exercise 13.4
+  def translate[F[_],G[_],A](f: Free[F,A])(fg: F ~> G): Free[G,A] = {
+    type FreeG[A] = Free[G,A]
+    val t = new (F ~> FreeG) {
+      def apply[A](a: F[A]): Free[G,A] = Suspend { fg(a) }
+    }
+    runFree(f)(t)(freeMonad[G])
+  }
+
+  def runConsole[A](a: Free[Console,A]): A =
+    runTrampoline { translate(a)(new (Console ~> Function0) {
+      def apply[A](c: Console[A]) = c.toThunk
+    })}
+
+  case class ConsoleReader[A](run: String => A) {
+    def map[B](f: A => B): ConsoleReader[B] =
+      ConsoleReader(r => f(run(r)))
+    def flatMap[B](f: A => ConsoleReader[B]): ConsoleReader[B] =
+      ConsoleReader(r => f(run(r)).run(r))
+  }
+  object ConsoleReader {
+    implicit val monad = new Monad[ConsoleReader] {
+      override def unit[A](a: => A): ConsoleReader[A] = ConsoleReader(_ => a)
+      override def flatMap[A, B](ma: ConsoleReader[A])(f: (A) => ConsoleReader[B]): ConsoleReader[B] = ma flatMap f
+    }
+  }
+
+  val consoleToReader = new (Console ~> ConsoleReader) {
+    override def apply[A](a: Console[A]): ConsoleReader[A] = a.toReader
+  }
+
+  def runConsoleReader[A](io: Console.ConsoleIO[A]): ConsoleReader[A] =
+    runFree[Console,ConsoleReader,A](io)(consoleToReader)
+
+  case class Buffers(in: List[String], out: Vector[String])
+
+  // A specialized state monad
+  case class ConsoleState[A](run: Buffers => (A, Buffers)) {
+    def map[B](f: A => B): ConsoleState[B] =
+      ConsoleState { s =>
+        val (a, s1) = run(s)
+        (f(a), s1)
+      }
+    def flatMap[B](f: A => ConsoleState[B]): ConsoleState[B] =
+      ConsoleState { s =>
+        val (a, s1) = run(s)
+        f(a).run(s1)
+      }
+  }
+  object ConsoleState {
+    implicit val monad = new Monad[ConsoleState] {
+      def unit[A](a: => A) = ConsoleState(bufs => (a,bufs))
+      def flatMap[A,B](ra: ConsoleState[A])(f: A => ConsoleState[B]) = ra flatMap f
+    }
+  }
+
+  val consoleToState =
+    new (Console ~> ConsoleState) { def apply[A](a: Console[A]) = a.toState }
+
+  def runConsoleState[A](io: Console.ConsoleIO[A]): ConsoleState[A] =
+    runFree[Console,ConsoleState,A](io)(consoleToState)
 
 }
