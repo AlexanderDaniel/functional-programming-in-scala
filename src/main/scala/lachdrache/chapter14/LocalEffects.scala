@@ -1,5 +1,34 @@
 package lachdrache.chapter14
 
+object Mutable {
+  def quicksort(xs: List[Int]): List[Int] = if (xs.isEmpty) xs else {
+    val arr = xs.toArray
+    def swap(x: Int, y: Int) = {
+      val tmp = arr(x)
+      arr(x) = arr(y)
+      arr(y) = tmp
+    }
+    def partition(l: Int, r: Int, pivot: Int) = {
+      val pivotVal = arr(pivot)
+      swap(pivot, r)
+      var j = l
+      for (i <- l until r) if (arr(i) < pivotVal) {
+        swap(i, j)
+        j += 1
+      }
+      swap(j, r)
+      j
+    }
+    def qs(l: Int, r: Int): Unit = if (l < r) {
+      val pi = partition(l, r, l + (r - l) / 2)
+      qs(l, pi - 1)
+      qs(pi + 1, r)
+    }
+    qs(0, arr.length - 1)
+    arr.toList
+  }
+}
+
 sealed trait ST[S,A] { self =>
   protected def run(s: S): (A,S)
   def map[B](f: A => B): ST[S,B] = new ST[S,B] {
@@ -96,6 +125,42 @@ object STArray {
     ST(new STArray[S,A] {
       lazy val value = xs.toArray
     })
+
+}
+
+object QuicksortUsingST {
+  def noop[S] = ST[S,Unit](())
+
+  // Exercise 14.2
+  def partition[S](arr: STArray[S,Int], l: Int, r: Int, pivot: Int): ST[S,Int] = for {
+    vp <- arr.read(pivot)
+    _ <- arr.swap(pivot, r)
+    j <- STRef(l)
+    _ <- (l until r).foldLeft(noop[S])((s, i) => for {
+      _ <- s
+      vi <- arr.read(i)
+      _  <- if (vi < vp) (for {
+        vj <- j.read
+        _  <- arr.swap(i, vj)
+        _  <- j.write(vj + 1)
+      } yield ()) else noop[S]
+    } yield ())
+    x <- j.read
+    _ <- arr.swap(x, r)
+  } yield x
+
+  // Exercise 14.2
+  def qs[S](arr: STArray[S,Int], l: Int, r: Int): ST[S,Unit] =
+    if (l < r) {
+      for {
+        pi <- partition(arr, l, r, l + (r - l) / 2)
+        _ <- qs(arr, l, pi -1)
+        _ <- qs(arr, pi + 1, r)
+      } yield ()
+    } else {
+      noop[S]
+    }
+
 
 }
 
