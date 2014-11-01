@@ -173,5 +173,38 @@ object QuicksortUsingST {
 
 }
 
+// Exercise 14.3
+sealed abstract class STMap[S, K, V] {
+  protected def value: scala.collection.mutable.HashMap[K,V]
+
+  def size: ST[S,Int] = ST(value.size)
+
+  def put(k: K, v: V): ST[S,Unit] =
+    ST(value.put(k, v))
+
+  def +=(kv :(K,V)): ST[S,Unit] =
+    ST(value += kv)
+
+  def -=(k: K): ST[S,Unit] =
+    ST(value -= k)
+
+  def get(k: K): ST[S, Option[V]] =
+    ST(value.get(k))
+
+  def freeze: ST[S,Map[K,V]] =
+    ST(value.toMap)
+}
+
+object STMap {
+  def empty[S,K,V]: ST[S, STMap[S,K,V]] =
+    ST(new STMap[S,K,V] {
+      val value = scala.collection.mutable.HashMap.empty[K,V]
+    })
+
+  def fromMap[S,K,V](m: Map[K,V]): ST[S, STMap[S,K,V]] =
+    ST(new STMap[S,K,V] {
+      val value = (scala.collection.mutable.HashMap.newBuilder[K,V] ++= m).result
+    })
+}
 
 
