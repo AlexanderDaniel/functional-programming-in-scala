@@ -76,6 +76,14 @@ sealed abstract class STArray[S,A](implicit manifest: Manifest[A]) {
     }
   }
 
+  def swap(i: Int, j: Int): ST[S, Unit] =
+    for {
+      iv <- read(i)
+      jv <- read(j)
+      _ <- write(i, jv)
+      _ <- write(j, iv)
+    } yield ()
+
 }
 
 object STArray {
@@ -83,6 +91,12 @@ object STArray {
     ST(new STArray[S,A] {
       lazy val value = Array.fill(sz)(v)
     })
+
+  def fromList[S,A:Manifest](xs: List[A]): ST[S, STArray[S,A]] =
+    ST(new STArray[S,A] {
+      lazy val value = xs.toArray
+    })
+
 }
 
 
