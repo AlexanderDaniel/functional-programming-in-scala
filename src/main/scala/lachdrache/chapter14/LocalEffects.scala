@@ -203,8 +203,9 @@ object STMap {
 
   def fromMap[S,K,V](m: Map[K,V]): ST[S, STMap[S,K,V]] =
     ST(new STMap[S,K,V] {
-      val value = (scala.collection.mutable.HashMap.newBuilder[K,V] ++= m).result
+      val value = (scala.collection.mutable.HashMap.newBuilder[K,V] ++= m).result()
     })
 }
+
 
 
